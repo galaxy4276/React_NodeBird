@@ -15,7 +15,6 @@ import { useSelector } from 'react-redux';
 
 const AppLayout = ({ children }) => {
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  console.log(isLoggedIn);
 
   const style = useMemo(() => ({ marginTop: 10 }), []);
   
