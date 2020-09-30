@@ -17,7 +17,7 @@ const rootReducer = combineReducers({
     }
   },
   user,
-  post,
+  post, 
 });
 
 
