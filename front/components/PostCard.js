@@ -6,6 +6,11 @@ import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import PostImages from './PostImages';
 import CommentForm from './CommentForm';
+import styled from 'styled-components';
+
+const CardWrapper = styled.div`
+  margin-bottom: 20px;
+`;
 
 
 const PostCard = ({ post }) => {
@@ -23,7 +28,7 @@ const PostCard = ({ post }) => {
   }, []);
 
   return (
-    <div style={{ marginBottom: 20 }}>
+    <CardWrapper key={post.id} >
       <Card
         cover={post.Images[0] && <PostImages images={post.Images} />}
         actions={[
@@ -32,16 +37,21 @@ const PostCard = ({ post }) => {
             ? <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onToggleLike} />
             : <HeartOutlined key="heart" onClick={onToggleLike} />,
           <MessageOutlined key="comment" onClick={onToggleComment} />,
-          <Popover key="more" content={(
+          <Popover 
+            key="more" 
+            content={(
             <Button.Group>
-              {id && post.User.id === id ? (
-                <>
-                  <Button>수정</Button>
-                  <Button type="danger">삭제</Button>
-                </>)
+              {id && post.User.id === id 
+              ? (
+                  <>
+                    <Button>수정</Button>
+                    <Button type="danger">삭제</Button>
+                  </>
+                )
               : <Button>신고</Button>}
             </Button.Group>
-          )}>
+          )}
+          >
             <EllipsisOutlined />
           </Popover>
         ]}
@@ -52,8 +62,8 @@ const PostCard = ({ post }) => {
           description={post.content}
         />
       </Card>
-      {commentFormOpened &&
-        <div>
+      {commentFormOpened && (
+        <>
           <CommentForm post={post} />
           <List
             header={`${post.Comments.length}개의 댓글`}
@@ -69,12 +79,13 @@ const PostCard = ({ post }) => {
               </li>
             )}
           />
-        </div>}
-    </div>
+        </>
+      )}
+    </CardWrapper>
   );
 };
 
-PostCard.propTypes = {
+PostCard.propTypes = { 
   post: PropTypes.shape({
     id: PropTypes.number,
     User: PropTypes.object,

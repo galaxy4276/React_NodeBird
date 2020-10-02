@@ -16,7 +16,7 @@ import { useSelector } from 'react-redux';
 const AppLayout = ({ children }) => {
   const { isLoggedIn } = useSelector((state) => state.user);
 
-  const style = useMemo(() => ({ marginTop: 10 }), []);
+  const style = useMemo(() => ({ verticalAlign: 'middle' }), []);
   
   return (
     <div>
@@ -34,15 +34,12 @@ const AppLayout = ({ children }) => {
         <Menu.Item>
           <Input.Search enterButton style={style} />
         </Menu.Item>
-        <Menu.Item>
-          <Link href="/signup">
-            <a>회원가입</a>
-          </Link>
-        </Menu.Item>
       </Menu>
       <Row gutter={8}>
         <Col xs={24} md={6} >
-          {isLoggedIn ? <UserProfile /> : <LoginForm />}
+          {isLoggedIn 
+            ? <UserProfile /> 
+            : <LoginForm />}
         </Col>
         <Col xs={24} md={12} >
           {children}
