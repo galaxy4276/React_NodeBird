@@ -4,7 +4,9 @@ import { CloseOutlined } from '@ant-design/icons';
 
 export const Overlay = styled.div`
   position: fixed;
-  z-index: 5000;
+  z-index: 100;
+  width: 100%;
+  height: 100%;
   top: 0;
   left: 0;
   right: 0;
@@ -32,7 +34,6 @@ export const SlickWrapper = styled.div`
 `;
 
 export const ImageWrapper = styled.div`
-  position: relative;
   padding: 32px;
   text-align: center;
   
@@ -43,7 +44,7 @@ export const ImageWrapper = styled.div`
 `;
 
 export const Indicator = styled.div`
-  teext-align: center;
+  text-align: center;
 
   & > div {
     width: 75px;
@@ -65,6 +66,9 @@ export const Global = createGlobalStyle`
       width: 350px;
       max-width: 400px;
     }
+  }
+  .ant-card-cover {
+    transform: none !important;
   }
 `;
 
