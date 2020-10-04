@@ -1,69 +1,12 @@
-import { all, call, delay, put, takeEvery } from 'redux-saga/effects';
-// import axios from 'axios';
+import { all, fork } from 'redux-saga/effects';
+import postSaga from './post';
+import userSaga from './user';
 
-// function logInAPI() {
-//   return axios.post('/api/login');
-// }
-
-function* logIn() {
-  try {
-    yield delay(1000);
-    yield put({
-      type: 'LOG_IN_SUCCESS',
-    });
-  } catch (err) {
-    yield put({
-      type: 'LOG_IN_FAILURE',
-      data: err.response.data
-    });
-  }
-}
-
-function* logOut() {
-  try {
-    yield put({
-      type: 'LOG_OUT_SUCCESS',
-    });
-  } catch (err) {
-    yield put({
-      type: 'LOG_OUT_FAILURE',
-      data: err.response.data
-    });
-  }
-}
-
-function* addPost() {
-  try {
-    yield put({
-      type: 'LOG_OUT_SUCCESS',
-    });
-  } catch (err) {
-    yield put({
-      type: 'LOG_OUT_FAILURE',
-      data: err.response.data
-    });
-  }
-}
-
-
-
-function* watchLogIn() {
-    yield takeEvery('LOG_IN_REQUEST', logIn);
-}
-
-function* watchLogOut() {
-    yield takeEvery('LOG_OUT_REQUEST', logOut);
-}
-
-function* watchAddPost() {
-    yield takeEvery('ADD_POST_REQUEST', addPost);
-}
 
 export default function* rootSaga() {
   yield all([
-    call(watchLogIn),
-    call(watchLogOut).
-    call(watchAddPost),
+    fork(postSaga),
+    fork(userSaga),
   ]);
 }
 
