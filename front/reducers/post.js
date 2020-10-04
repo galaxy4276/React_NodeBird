@@ -1,3 +1,5 @@
+import { createAction, handleActions } from 'redux-actions';
+
 export const initialState = {
   mainPosts: [{
     id: 1,
@@ -29,7 +31,12 @@ export const initialState = {
     ], 
   }],
   imagePaths: [], // Save image path
-  postAdded: false // post sucessful is true
+  addPostLoading: false, // post sucessful is true
+  addPostDone: false,
+  addPostError: null,
+  addCommentLoading: false,
+  addCommentDone: false,
+  addCommentError: null,
 };
 
 const dummyPost = {
@@ -44,25 +51,66 @@ const dummyPost = {
 };
 
 
-const ADD_POST = 'ADD_POST';
+export const ADD_POST_REQUEST = 'ADD_POST';
+export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
+export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
+
+export const ADD_COMMENT_REQUEST = 'ADD_COMMENT';
+export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
+export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE';
 
 
-export const addPost = {
-  type: ADD_POST,
-}
+export const addPostRequest = createAction(ADD_POST_REQUEST, data => data);
+export const addCommentRequest = createAction(ADD_COMMENT_REQUEST, data => data);
 
 
-const reducer = (state = initialState, action) => {
-  switch (action.type) {
-    case ADD_POST:
-      return {
-        ...state,
-        mainPosts: [dummyPost, ...state.mainPosts]  
-      };
-    default:
-      return state;
-  }
-};
-
-
-export default reducer;
+const reducer = handleActions(
+  {
+    [ADD_POST_REQUEST]: (state) => ({
+      ...state,
+      addPostLoading: true,
+      addPostDone: false,
+      addPostError: null,
+    }),
+    [ADD_POST_SUCCESS]: (state) => ({
+      ...state,
+      mainPosts: [dummyPost, ...state.mainPosts],
+      addPostLoading: false,
+      addPostDone: true
+    }),
+    [ADD_POST_FAILURE]: (state, { payload }) => ({
+      ...state,
+      addPostError: payload.error,
+    }),
+    [ADD_COMMENT_REQUEST]: (state) => ({
+      ...state,
+      addCommentLoading: true,
+      addCommentDone: false,
+      addCommentError: null,
+    }),
+    [ADD_COMMENT_SUCCESS]: (state) => ({
+      ...state,
+      addCommentLoading: false,
+      addCommentDone: true
+    }),
+    [ADD_COMMENT_FAILURE]: (state, { payload }) => ({
+      ...state,
+      addCommentError: payload.error,
+    }),
+  },
+  initialState,
+  );
+  
+  
+  export default reducer;
+    // const reducer = (state = initialState, action) => {
+    //   switch (action.type) {
+    //     case ADD_POST_REQUEST:
+    //       return {
+    //         ...state,
+    //         mainPosts: [dummyPost, ...state.mainPosts]  
+    //       };
+    //     default:
+    //       return state;
+    //   }
+    // };

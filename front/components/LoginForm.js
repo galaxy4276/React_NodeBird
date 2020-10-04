@@ -18,7 +18,7 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const { isLoggingIn } = useSelector((state) => state.user);
+  const { logInLoading } = useSelector((state) => state.user);
 
   const [id, onChangeId] = useInput('');
   const [password, onChangePassword] = useInput('');
@@ -46,7 +46,7 @@ const LoginForm = () => {
           />
         </div>
         <ButtonWrapper>
-          <Button type="primary" htmlType="submit" loading={isLoggingIn}>로그인</Button>
+          <Button type="primary" htmlType="submit" loading={logInLoading}>로그인</Button>
           <Link href="/signup"><a><Button>회원가입</Button></a></Link>
         </ButtonWrapper>
       </FormWrapper>
