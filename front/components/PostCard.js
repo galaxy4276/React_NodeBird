@@ -2,12 +2,13 @@ import React, { useCallback, useState } from 'react';
 import { Card, Button, Popover, List, Comment, Avatar } from 'antd';
 import { EllipsisOutlined, HeartOutlined, 
   MessageOutlined, RetweetOutlined, HeartTwoTone } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import PostImages from './PostImages';
 import CommentForm from './CommentForm';
 import styled from 'styled-components';
 import PostCardContent from './PostCardContent';
+import { REMOVE_POST_REQUEST } from '../reducers/post';
 
 const CardWrapper = styled.div`
   margin-bottom: 20px;
@@ -18,7 +19,10 @@ const PostCard = ({ post }) => {
   const [liked, setLiked] = useState(false);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
 
+  const dispatch = useDispatch();
+
   const id = useSelector((state) => state.user.me?.id);
+  const { removePostLoading } = useSelector((state) => state.post);
   // const id = me?.id;  // me && me.id;
   const onToggleLike = useCallback(() => {
     setLiked(prev => !prev); // 이전 데이터가 들어가 있음. 
@@ -26,6 +30,13 @@ const PostCard = ({ post }) => {
 
   const onToggleComment = useCallback(() => {
     setCommentFormOpened(prev => !prev); // 이전 데이터가 들어가 있음.
+  }, []);
+
+  const onRemovePost = useCallback(() => {
+    dispatch({
+      type: REMOVE_POST_REQUEST,
+      data: post.id,
+    })
   }, []);
 
   return (
@@ -46,7 +57,13 @@ const PostCard = ({ post }) => {
               ? (
                   <>
                     <Button>수정</Button>
-                    <Button type="danger">삭제</Button>
+                    <Button 
+                      type="danger" 
+                      onClick={onRemovePost}
+                      loading={removePostLoading}
+                      >
+                      삭제
+                      </Button>
                   </>
                 )
               : <Button>신고</Button>}
@@ -88,7 +105,7 @@ const PostCard = ({ post }) => {
 
 PostCard.propTypes = { 
   post: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.string,
     User: PropTypes.object,
     content: PropTypes.string,
     createdAt: PropTypes.object,

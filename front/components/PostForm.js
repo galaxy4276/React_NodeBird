@@ -1,29 +1,31 @@
-import React, { useCallback, useState, useRef } from 'react';
+import React, { useCallback, useRef, useEffect } from 'react';
 import { Form, Input, Button } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPostRequest } from '../reducers/post';
+import useInput from '../hooks/useInput';
 
 
 const PostForm = () => {
-  const [text, setText] = useState('');
-  const { imagePaths } = useSelector((state) => state.post);
+  const [text, onChangeText, setText] = useInput('');
+  const { imagePaths, addPostDone, addPostLoading } = useSelector((state) => state.post);
 
   const imageInput = useRef();
 
   const dispatch = useDispatch();
 
-  const onChangeText = useCallback((e) => {
-    setText(e.target.value);
-  }, []);
-
   const onClickImageUpload = useCallback(() => {
     imageInput.current.click();
   }, [imageInput.current]);
 
+  useEffect(() => {
+    if (addPostDone) {
+      setText('');
+    }
+  }, [addPostDone]);
+
   const onSubmit = useCallback(() => {  
-    dispatch(addPostRequest);
-    setText('');
-  }, []);
+    dispatch(addPostRequest(text));
+  }, [text]);
 
   return (
     <Form style={{ margin: '10px 0 20px' }} encType="multipart/form-data" onFinish={onSubmit}>
@@ -40,7 +42,7 @@ const PostForm = () => {
           type="primary" 
           style={{ float: 'right' }} 
           htmlType="submit"
-          onClick={onSubmit}
+          loading={addPostLoading}
         >짹짹
         </Button>
       </div>
@@ -49,7 +51,7 @@ const PostForm = () => {
           <div key={v} style={{ display: 'inline-block' }}>
             <img src={v} style={{ width: '200px' }} alt={v} />
             <div>
-              <Button>제거</Button>
+              <Button>제거</Button>   
             </div>
           </div>
         ))}
