@@ -5,46 +5,15 @@ import faker from 'faker';
 
 
 export const initialState = {
-  mainPosts: [{
-    id: 'first',
-    User: {
-      id: 1,
-      nickname: '불로초',
-    },
-    content: '첫 번째 게시글 #해시태그 #익스프레스',
-    Images: [{
-      id: shortid.generate(),
-      src: 'https://images.unsplash.com/photo-1593642634443-44adaa06623a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1225&q=80'
-    }, {
-      id: shortid.generate(),
-      src: 'https://images.unsplash.com/photo-1601403325497-a2248bae962a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80'
-    }, {
-      id: shortid.generate(),
-      src: 'https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80'
-    }],
-    Comments: [
-      {
-        id: shortid.generate(),
-        User: {
-          id: shortid.generate(),
-          nickname: 'minesp'
-        },
-        content: '우와 개정판이 나왔군요~',
-      }, 
-      {
-        id: shortid.generate(),
-        User: {
-          id: shortid.generate(),
-          nickname: 'rim',
-        },
-        content: '얼른 사고싶어요.',
-      }
-    ], 
-  }],
+  mainPosts: [],
   imagePaths: [], // Save image path
+  hasMorePost: true,
   addPostLoading: false, // post sucessful is true
   addPostDone: false,
   addPostError: null,
+  loadPostLoading: false, 
+  loadPostDone: false,
+  loadPostError: null,
   removePostLoading: false, // post sucessful is true
   removePostDone: false,
   removePostError: null,
@@ -54,34 +23,29 @@ export const initialState = {
 };
 
 
-const randomImage = () => {
-  const arr = [];
-  const nand = Math.random() * 5;
-  for (let i = 0; i < nand; i++) {
-    arr.push({ src: faker.image.image() });
-  }
-
-  return arr;
-};
-
-initialState.mainPosts = initialState.mainPosts.concat(
-  Array(20).fill().map(() => ({
+export const genereateDummyPost = number => Array(number).fill().map(() => ({
+  id: shortid.generate(),
+  User: {
     id: shortid.generate(),
+    nickname: faker.name.findName(),
+  },
+  content: faker.lorem.paragraph(),
+  Images: (() => {
+    const arr = [];
+    const nand = Math.random() * 5;
+    for (let i = 0; i < nand; i++) {
+      arr.push({ src: faker.image.image() });
+    }
+    return arr;
+  })(),
+  Comments: [{
     User: {
       id: shortid.generate(),
       nickname: faker.name.findName(),
     },
-    content: faker.lorem.paragraph(),
-    Images: randomImage(),
-    Comments: [{
-      User: {
-        id: shortid.generate(),
-        nickname: faker.name.findName(),
-      },
-      content: faker.lorem.sentence(),
-    }],
-  }))
-);
+    content: faker.lorem.sentence(),
+  }],
+}));
 
 
 const dummyPost = (data) => {
@@ -112,6 +76,10 @@ const dummyComment = (data) => ({
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
+
+export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST';
+export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS';
+export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE';
 
 export const REMOVE_POST_REQUEST = 'REMOVE_POST_REQUEST';
 export const REMOVE_POST_SUCCESS = 'REMOVE_POST_SUCCESS';
@@ -147,6 +115,24 @@ const reducer = handleActions(
       produce(state, draft => {
         draft.addPostLoading = false;
         draft.addPostError = data.error;
+    }),
+    [LOAD_POST_REQUEST]: (state) =>
+      produce(state, draft => {
+        draft.loadPostDone = false;
+        draft.loadPostLoading = true;
+        draft.loadPostError = null;
+    }),
+    [LOAD_POST_SUCCESS]: (state, { data }) => 
+      produce(state, draft => {
+        draft.loadPostDone = true;
+        draft.loadPostLoading = false;
+        draft.mainPosts = data.concat(draft.mainPosts);
+        draft.hasMorePost = draft.mainPosts.length < 50; // 게시글을 50개만 보겠다.
+    }),
+    [LOAD_POST_FAILURE]: (state, { data }) => 
+      produce(state, draft => {
+        draft.loadPostLoading = false;
+        draft.loadPostError = data.error;
     }),
     [REMOVE_POST_REQUEST]: (state) => 
       produce(state, draft => {
