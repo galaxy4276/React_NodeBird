@@ -13,7 +13,13 @@ export const initialState = {
   signUpLoading: false, // 회원가입 시도 중
   signUpDone: false,
   signUpError: null,
-  changeNicknameLoading: false, // 회원가입 시도 중
+  followLoading: false, // 팔로우 시도 중
+  followDone: false,
+  followError: null,
+  unFollowLoading: false, // 언팔로우 시도 중
+  unFollowDone: false,
+  unFollowError: null,
+  changeNicknameLoading: false, // 닉네임 시도 중
   changeNicknameDone: false,
   changeNicknameError: null,
   me: null,
@@ -62,6 +68,40 @@ const dummyUser = (payload) => ({
 
 const reducer = handleActions(
   {
+    [UNFOLLOW_REQUEST]: (state) => 
+      produce(state, draft => {
+        draft.unFollowLoading = true;
+        draft.unFollowError = null;
+        draft.unFollowDone = false; 
+    }),
+    [UNFOLLOW_SUCCESS]: (state, { data }) =>
+      produce(state, draft => {
+        draft.unFollowLoading = false;
+        draft.unFollowDone = true;
+        draft.me.Followings = draft.me.Followings.filter((v) => v.id !== data);
+    }),
+    [UNFOLLOW_FAILURE]: (state, payload) =>
+      produce(state, draft => {
+        draft.unFollowLoading = false;
+        draft.unFollowError = payload.error;
+    }),
+    [FOLLOW_REQUEST]: (state) => 
+      produce(state, draft => {
+        draft.followLoading = true;
+        draft.followError = null;
+        draft.followDone = false; 
+    }),
+    [FOLLOW_SUCCESS]: (state, { data }) =>
+      produce(state, draft => {
+        draft.followLoading = false;
+        draft.followDone = true;
+        draft.me.Followings.push({ id: data });
+    }),
+    [FOLLOW_FAILURE]: (state, payload) =>
+      produce(state, draft => {
+        draft.followLoading = false;
+        draft.followError = payload.error;
+    }),
     [LOG_IN_REQUEST]: (state) => 
       produce(state, draft => {
         draft.logInLoading = true;
