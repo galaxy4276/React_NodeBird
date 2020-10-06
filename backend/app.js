@@ -2,6 +2,8 @@ import express from 'express';
 import logger from 'morgan';
 import db from './models';
 import postRouter from './routes/post';
+import userRouter from './routes/user';
+import cors from 'cors';
 
 
 const app = express();
@@ -11,7 +13,14 @@ db.sequelize.sync()
   })
   .catch(console.error);
 
+
+app.use(cors({
+  origin: '*',
+  credentials: false,
+})); // *origin -> 허용 도메인 
 app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello</h1>');
@@ -27,6 +36,7 @@ app.get('/posts', (req, res) => {
 
 
 app.use('/post', postRouter);
+app.use('/user', userRouter);
 
 
 app.listen(3065, () => {
