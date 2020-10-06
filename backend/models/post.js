@@ -1,4 +1,4 @@
-export default (sequelize, DataTypes) => {
+module.exports =  (sequelize, DataTypes) => {
   const Post = sequelize.define('post', { // db in Posts table
     // id가 기본적으로 들어간다.
     content: {
@@ -6,11 +6,16 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
     },
   }, {
-    charset: 'utf8mb4', // emoji 쓰려면 mb4 
-    collate: 'utf8_general_ci',
   });
 
-  Post.associate = (db) => {};
+  Post.associate = (db) => {
+    db.Post.belongsTo(db.User);
+    db.Post.belongsToMany(db.Hashtag, { through: 'PostHashtag' });
+    db.Post.hasMany(db.Comment);
+    db.Post.hasMany(db.Image);
+    db.Post.belongsToMany(db.User, { through: 'Like', as: 'Likers' });
+    db.Post.belongsTo(db.Post, { as: 'Retweet' });
+  };
 
-  return Post
+  return Post;
 }

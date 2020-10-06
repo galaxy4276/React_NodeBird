@@ -1,10 +1,15 @@
 import express from 'express';
 import logger from 'morgan';
-
+import db from './models';
 import postRouter from './routes/post';
 
-const app = express();
 
+const app = express();
+db.sequelize.sync()
+  .then(() => {
+    console.log('디비 연결 성공');
+  })
+  .catch(console.error);
 
 app.use(logger('dev'));
 

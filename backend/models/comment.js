@@ -1,16 +1,19 @@
-export default (sequelize, DataTypes) => {
+module.exports = (sequelize, DataTypes) => {
   const Comment = sequelize.define('Comment', { // db in Comments table
     // id가 기본적으로 들어간다.
     content: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    // UserId: {},
+    // PostId: {},
   }, {
-    charset: 'utf8mb4', // emoji 쓰려면 mb4 
-    collate: 'utf8_general_ci',
   });
 
-  Comment.associate = (db) => {};
+  Comment.associate = (db) => {
+    db.Comment.belongsTo(db.User);
+    db.Comment.belongsTo(db.Post);
+  };
 
-  return Comment
+  return Comment;
 }
