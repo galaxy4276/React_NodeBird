@@ -112,7 +112,7 @@ const reducer = handleActions(
       produce(state, draft => {
         draft.logInLoading = false;
         draft.logInDone = true;
-        draft.me = dummyUser(payload);
+        draft.me = payload;
     }),
     [LOG_IN_FAILURE]: (state, payload) =>
       produce(state, draft => {

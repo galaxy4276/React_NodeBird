@@ -4,6 +4,12 @@ import db from './models';
 import postRouter from './routes/post';
 import userRouter from './routes/user';
 import cors from 'cors';
+import passportConfig from './passport';
+import cookie from 'cookie-parser';
+import session from 'express-session';
+import passport from 'passport';
+require('dotenv').config();
+const env = process.env;
 
 
 const app = express();
@@ -12,7 +18,7 @@ db.sequelize.sync()
     console.log('디비 연결 성공');
   })
   .catch(console.error);
-
+passportConfig();
 
 app.use(cors({
   origin: '*',
@@ -21,6 +27,15 @@ app.use(cors({
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookie(env.secret));
+app.use(session({
+  secret: env.secret,
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello</h1>');

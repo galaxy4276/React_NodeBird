@@ -8,28 +8,35 @@ import {
 } from '../reducers/user';
 import axios from 'axios';
 
+axios.defaults.baseURL = 'http://localhost:3065';
+
+function logInAPI(data) {
+  return axios.post('/user/login', data);
+}
 
 function* logIn(action) {
-  console.log('saga logIn');
-  console.log('saga aciton => payload');
-  console.table(action.payload);
   try {
-    yield delay(1000);
+    const result = yield call(logInAPI, action.payload);
     yield put({
       type: LOG_IN_SUCCESS,
-      payload: action.payload
+      payload: result.data,  
     });
   } catch (err) {
+    console.log(err);
     yield put({
       type: LOG_IN_FAILURE,
-      error: err.response.data
+      error: err.response.data,
     });
   }
 }
 
+function logOutAPI() {
+  return axios.post('/user/logout');
+}
+
 function* logOut() {
   try {
-    yield delay(1000);
+    yield call(logOutAPI);
     yield put({
       type: LOG_OUT_SUCCESS,
     });
@@ -42,7 +49,7 @@ function* logOut() {
 }
 
 function signUpAPI(data) {
-  return axios.post('http://localhost:3065/user', data);
+  return axios.post('/user', data);
 }
 
 function* signUp(action) {

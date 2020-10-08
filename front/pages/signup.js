@@ -7,7 +7,7 @@ import AppLayout from '../components/AppLayout';
 import useInput from '../hooks/useInput';
 import { useDispatch, useSelector } from 'react-redux';
 import { SIGN_UP_REQUEST } from '../reducers/user';
-import { Router } from 'next/dist/client/router';
+import { useRouter } from 'next/router';
 
 
 const ErrorMessage = styled.div`
@@ -16,12 +16,19 @@ const ErrorMessage = styled.div`
 
 
 const Signup = () => {
+  const Router = useRouter();
   const dispatch = useDispatch();
-  const { signUpLoading, signUpDone, signupError } = useSelector((state) => state.user);
+  const { signUpLoading, signUpDone, signupError, me } = useSelector((state) => state.user);
+  
+  useEffect(() => {
+    if (me && me.id) {
+      Router.replace('/');
+    }
+  }, [me && me.id]);
 
   useEffect(() => {
     if (signUpDone) {
-      Router.push('/');
+      Router.replace('/');
     }
   }, [signUpDone]);
 
@@ -30,7 +37,6 @@ const Signup = () => {
       window.alert(signupError);
     }
   }, [signupError]);
-
 
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
