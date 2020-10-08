@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
 import passport from 'passport';
+import { isLoggedIn, isNotLoggedIn } from './middlewares';
 
 const router = require('express').Router();
 const { User, Post } = require('../models');
-
 
 router.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
@@ -19,7 +19,7 @@ router.post('/login', (req, res, next) => {
       return res.status(401).send(info.reason);
     }
 
-    return req.login(user, async (loginErr) => {
+    return req.login(user, isLoggedIn, async (loginErr) => {
       if (loginErr) {
         console.log('authenticate req.login(callback:= loginErr)');
         console.error(loginErr);
