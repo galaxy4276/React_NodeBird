@@ -22,6 +22,9 @@ export const initialState = {
   changeNicknameLoading: false, // 닉네임 시도 중
   changeNicknameDone: false,
   changeNicknameError: null,
+  loadUserLoading: false, // 유저 정보 가져오기 시도 중
+  loadUserDone: false,
+  loadUserError: null,
   me: null,
   signUpData: {},
   loginData: {},
@@ -31,6 +34,10 @@ export const initialState = {
 export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
 export const LOG_IN_FAILURE = 'LOG_IN_FAILURE';
+
+export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
+export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
+export const LOAD_MY_INFO_FAILURE = 'LOAD_MY_INFO_FAILURE';
 
 export const LOG_OUT_REQUEST = 'LOG_OUT_REQUEST';
 export const LOG_OUT_SUCCESS = 'LOG_OUT_SUCCESS';
@@ -135,6 +142,23 @@ const reducer = handleActions(
       ...state,
       logOutLoading: false,
       logOutError: error || 'critical',
+    }),
+    [LOAD_MY_INFO_REQUEST]: (state) => 
+      produce(state, draft => {
+        draft.loadUserLoading = true;
+        draft.loadUserDone = false;
+        draft.loadUserError = null;
+    }),
+    [LOAD_MY_INFO_SUCCESS]: (state, { data }) => 
+      produce(state, draft => {
+        draft.loadUserLoading = false;
+        draft.loadUserDone = true;
+        draft.me = data;
+    }),
+    [LOAD_MY_INFO_FAILURE]: (state, { error }) => ({
+      ...state,
+      loadUserLoading: false,
+      loadUserError: error || 'critical',
     }),
     [SIGN_UP_REQUEST]: (state) => 
       produce(state, draft => {

@@ -2,6 +2,7 @@ import express from 'express';
 import logger from 'morgan';
 import db from './models';
 import postRouter from './routes/post';
+import postsRouter from './routes/posts';
 import userRouter from './routes/user';
 import cors from 'cors';
 import passportConfig from './passport';
@@ -9,7 +10,6 @@ import cookie from 'cookie-parser';
 import session from 'express-session';
 import passport from 'passport';
 require('dotenv').config();
-const env = process.env;
 
 
 const app = express();
@@ -21,15 +21,15 @@ db.sequelize.sync()
 passportConfig();
 
 app.use(cors({
-  origin: '*',
-  credentials: false,
+  origin: 'http://localhost:3060',
+  credentials: true,
 })); // *origin -> 허용 도메인 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookie(env.secret));
+app.use(cookie(process.env.SECRET));
 app.use(session({
-  secret: env.secret,
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: false,
 }));
@@ -37,20 +37,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-app.get('/', (req, res) => {
-  res.send('<h1>Hello</h1>');
-});
-
-app.get('/posts', (req, res) => {
-  res.json([
-    { id: 1, content: 'hello', },
-    { id: 2, content: 'melong', },
-    { id: 3, content: 'babo', },
-  ]);
-});
-
-
 app.use('/post', postRouter);
+app.use('/posts', postsRouter);
 app.use('/user', userRouter);
 
 

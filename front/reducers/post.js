@@ -48,20 +48,20 @@ export const genereateDummyPost = number => Array(number).fill().map(() => ({
 }));
 
 
-const dummyPost = (data) => {
-  console.log('dummyPost data');
-  console.table(data);
-  return {  
-    id: data.id,
-    content: data.content,
-    User: {
-      id: 1,
-      nickname: '최은기',
-    },
-    Images: [],
-    Comments: [],
-  };
-};
+// const dummyPost = (data) => {
+//   console.log('dummyPost data');
+//   console.table(data);
+//   return {  
+//     id: data.id,
+//     content: data.content,
+//     User: {
+//       id: 1,
+//       nickname: '최은기',
+//     },
+//     Images: [],
+//     Comments: [],
+//   };
+// };
 
 const dummyComment = (data) => ({
   id: shortid.generate(),
@@ -107,9 +107,10 @@ const reducer = handleActions(
     }),
     [ADD_POST_SUCCESS]: (state, { data }) => 
       produce(state, draft => {
+        console.table(data);
         draft.addPostLoading = false;
         draft.addPostDone = true;
-        draft.mainPosts.unshift(dummyPost(data));
+        draft.mainPosts.unshift(data);
     }),
     [ADD_POST_FAILURE]: (state, { data }) => 
       produce(state, draft => {
@@ -126,7 +127,7 @@ const reducer = handleActions(
       produce(state, draft => {
         draft.loadPostDone = true;
         draft.loadPostLoading = false;
-        draft.mainPosts = data.concat(draft.mainPosts);
+        draft.mainPosts = draft.mainPosts.concat(data); //data.concat(draft.mainPosts);
         draft.hasMorePost = draft.mainPosts.length < 50; // 게시글을 50개만 보겠다.
     }),
     [LOAD_POST_FAILURE]: (state, { data }) => 
@@ -159,8 +160,8 @@ const reducer = handleActions(
     }),
     [ADD_COMMENT_SUCCESS]: (state, { data }) => 
       produce(state, draft => {
-        const post = draft.mainPosts.find((v) => v.id === data.postId);
-        post.Comments.unshift(dummyComment(data.content));
+        const post = draft.mainPosts.find((v) => v.id === data.PostId);
+        post.Comments.unshift(data.content);
         draft.addCommentLoading = false,
         draft.addCommentDone = true
     }),
@@ -202,4 +203,3 @@ const reducer = handleActions(
         //     addCommentDone: true
         //   };
         // },
-        

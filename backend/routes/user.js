@@ -5,6 +5,44 @@ import { isLoggedIn, isNotLoggedIn } from './middlewares';
 const router = require('express').Router();
 const { User, Post } = require('../models');
 
+
+router.get('/', async (req, res, next) => {
+  console.log('load user');
+  try {
+    if (req.user) {
+      console.log('getUser req.user.id: ', req.user.id);
+      const user = await User.findOne({
+        where: { id: req.user.id },
+        attributes: {
+          exclude: ['password'],
+        },
+        include: [{
+          model: Post,
+          attributes: ['id'],
+        }, {
+          model: User,
+          attributes: ['id'],
+          as: 'Followings',
+        }, {
+          model: User,
+          attributes: ['id'],
+          as: 'Followers',
+        }]
+      });
+      
+      console.log(user);
+    
+      res.status(200).json(user);
+    } else {
+      res.status(200).json(null);
+    }
+  } catch(err) {
+    console.log('LOAD_MY_INFO ERROR');
+    console.error(err);
+    next(err);
+  }
+});
+
 router.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) {
@@ -19,13 +57,14 @@ router.post('/login', (req, res, next) => {
       return res.status(401).send(info.reason);
     }
 
-    return req.login(user, isLoggedIn, async (loginErr) => {
+    return req.login(user, async (loginErr) => {
       if (loginErr) {
         console.log('authenticate req.login(callback:= loginErr)');
         console.error(loginErr);
         return next(loginErr);
       }
       // res.setHeader('Cookie', 'cxlhy');
+      console.log(`user.id: ${user.id}`);
       const fullUserWithoutPassword = await User.findOne({
         where: { id: user.id },
         attributes: {
@@ -41,6 +80,9 @@ router.post('/login', (req, res, next) => {
           as: 'Followers',
         }]
       }); // 테이블 관계를 자동으로 합쳐서 반환한다.
+      console.log('req.user');
+      console.log(req.user);
+      console.log(req.session);
       return res.json(fullUserWithoutPassword);
     });
   })(req, res, next);

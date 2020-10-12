@@ -1,4 +1,4 @@
-import { all, delay, put, takeLatest, fork, throttle } from "redux-saga/effects";
+import { all, delay, put, takeLatest, fork, throttle, call } from "redux-saga/effects";
 import shortid from "shortid";
 import { 
   ADD_POST_FAILURE, ADD_POST_SUCCESS, ADD_POST_REQUEST,
@@ -8,32 +8,28 @@ import {
   LOAD_POST_REQUEST, LOAD_POST_SUCCESS, LOAD_POST_FAILURE, 
   genereateDummyPost
 } from '../reducers/post';
+import axios from 'axios';
+
 
 
 // TODO: error: ADD_POST_REQUEST를 한 번에 2번 처리함.
 
 
 function addPostAPI(data) {
-  return axios.post('/api/post', data);
+  return axios.post('/post', { content: data });
 }
 
 function* addPost(action) {
+  console.log(action);
   try {
-    console.log('saga addPost');
-    console.log(action.payload);
-    yield delay(1000);
-    const id = shortid.generate();
+    const result = yield call(addPostAPI, action.payload);
     yield put({
       type: ADD_POST_SUCCESS,
-      data: {
-      //action.payload,
-      id,
-      content: action.payload
-      }
+      data: result.data,
     });
     yield put({
       type: ADD_POST_TO_ME,
-      data: id
+      data: result.data.id,
     });
   } catch (err) {
     yield put({
@@ -44,16 +40,15 @@ function* addPost(action) {
 }
 
 function loadPostAPI(data) {
-  return axios.get('/api/post', data);
+  return axios.get('/posts', data);
 }
 
 function* loadPost(action) {
   try {
-    yield delay(1000);
-    const id = shortid.generate();
+    const result = yield call(loadPostAPI, action.data);
     yield put({
       type: LOAD_POST_SUCCESS,
-      data: genereateDummyPost(10),
+      data: result.data,
     });
   } catch (err) {
     yield put({
@@ -89,14 +84,16 @@ function* removePost(action) {
   };
 }
 
-function* addComment(action) {
+function addCommentAPI(data) {
+  return axios.post(`/post/${data.postId}/comment`, data); // POST /post/1/comment
+}
 
-  console.log(action);
+function* addComment(action) {
   try {
-    yield delay(2000);
+    const result = yield call(addCommentAPI, action.payload);
     yield put({
       type: ADD_COMMENT_SUCCESS,
-      data: action.payload,
+      data: result.data,
     });
   } catch (err) {
     yield put({

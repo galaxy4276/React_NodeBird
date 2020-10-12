@@ -20,6 +20,7 @@ export default (() => {
   
       if (pwVerify) {
         console.log('비밀번호가 일치하니 로그인을 수행합니다.');
+        console.log(`user.id: ${user.id}`);
         return done(null, user);
       }
       return done(null, false, { reason: '비밀번호가 틀렸습니다.' });
