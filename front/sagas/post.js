@@ -1,18 +1,15 @@
 import { all, delay, put, takeLatest, fork, throttle, call } from "redux-saga/effects";
-import shortid from "shortid";
 import { 
   ADD_POST_FAILURE, ADD_POST_SUCCESS, ADD_POST_REQUEST,
   ADD_COMMENT_REQUEST, ADD_COMMENT_SUCCESS, ADD_COMMENT_FAILURE,
   ADD_POST_TO_ME, REMOVE_POST_OF_ME,
   REMOVE_POST_REQUEST, REMOVE_POST_SUCCESS, REMOVE_POST_FAILURE, 
-  LOAD_POST_REQUEST, LOAD_POST_SUCCESS, LOAD_POST_FAILURE, 
-  genereateDummyPost
+  LOAD_POST_REQUEST, LOAD_POST_SUCCESS, LOAD_POST_FAILURE,
+  LIKE_POST_REQUEST, LIKE_POST_SUCCESS, LIKE_POST_FAILURE,
+  UNLIKE_POST_REQUEST, UNLIKE_POST_SUCCESS, UNLIKE_POST_FAILURE,
 } from '../reducers/post';
 import axios from 'axios';
 
-
-
-// TODO: error: ADD_POST_REQUEST를 한 번에 2번 처리함.
 
 
 function addPostAPI(data) {
@@ -58,28 +55,67 @@ function* loadPost(action) {
   }
 }
 
+function likePostAPI(data) {
+  return axios.patch(`/post/${data}/like`, data); // data = post.id
+}
+
+function* likePost(action) {
+  try {
+    const result = yield call(likePostAPI, action.data);
+    yield put({
+      type: LIKE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: LIKE_POST_FAILURE,
+      data: 'error',
+    });
+  }
+}
+
+
+function unLikePostAPI(data) {
+  return axios.delete(`/post/${data}/unlike`);
+}
+
+function* unLikePost(action) {
+  try {
+    const result = yield call(unLikePostAPI, action.data);
+    yield put({
+      type: UNLIKE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.log('unLikePost Saga Error');
+    console.error(err);
+    yield put({
+      type: UNLIKE_POST_FAILURE,
+      data: 'error',
+    });
+  }
+}
+
 function removePostAPI(data) {
-  return axios.delete('/api/post', data);
+  return axios.delete(`/post/${data}`);
 }
 
 function* removePost(action) {
   try {
-    console.log('removePost saga');
-    console.table(action);
-    yield delay(1000);
+    const result = yield call(removePostAPI, action.data);
     yield put({
       type: REMOVE_POST_SUCCESS,
-      data: action.data
+      data: result.data
     });
     yield put({
       type: REMOVE_POST_OF_ME,
-      data: action.data
+      data: result.data
     });
   } catch (err) {
     console.error(err);
     yield put({
       type: REMOVE_POST_FAILURE,
-      data: err
+      data: err.response.data,
     });
   };
 }
@@ -91,11 +127,14 @@ function addCommentAPI(data) {
 function* addComment(action) {
   try {
     const result = yield call(addCommentAPI, action.payload);
+    console.log('Saga Comment Result');
+    console.log(result);  
     yield put({
       type: ADD_COMMENT_SUCCESS,
       data: result.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: ADD_COMMENT_FAILURE,
       data: err.response.data,
@@ -120,9 +159,19 @@ function* watchAddComment() {
   yield takeLatest(ADD_COMMENT_REQUEST, addComment);
 }
 
+function* watchLikePost() {
+  yield takeLatest(LIKE_POST_REQUEST, likePost);
+}
+
+function* watchUnLikePost() {
+  yield takeLatest(UNLIKE_POST_REQUEST, unLikePost);
+}
+
 
 export default function* postSaga() {
   yield all([
+    fork(watchUnLikePost),
+    fork(watchLikePost),
     fork(watchAddPost),
     fork(watchLoadPost),
     fork(watchRemovePost),

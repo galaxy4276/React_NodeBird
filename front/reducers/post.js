@@ -20,6 +20,12 @@ export const initialState = {
   addCommentLoading: false,
   addCommentDone: false,
   addCommentError: null,
+  likePostLoading: false, 
+  likePostDone: false,
+  likePostError: null,
+  unLikePostLoading: false, 
+  unLikePostDone: false,
+  unLikePostError: null,
 };
 
 
@@ -92,6 +98,13 @@ export const ADD_COMMENT_REQUEST = 'ADD_COMMENT';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
 export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE';
 
+export const LIKE_POST_REQUEST = 'LIKE_POST_REQUEST';
+export const LIKE_POST_SUCCESS = 'LIKE_POST_SUCCESS';
+export const LIKE_POST_FAILURE = 'LIKE_POST_FAILURE';
+
+export const UNLIKE_POST_REQUEST = 'UNLIKE_POST_REQUEST';
+export const UNLIKE_POST_SUCCESS = 'UNLIKE_POST_SUCCESS';
+export const UNLIKE_POST_FAILURE = 'UNLIKE_POST_FAILURE';
 
 export const addPostRequest = createAction(ADD_POST_REQUEST, data => data);
 export const addCommentRequest = createAction(ADD_COMMENT_REQUEST, data => data);
@@ -127,13 +140,51 @@ const reducer = handleActions(
       produce(state, draft => {
         draft.loadPostDone = true;
         draft.loadPostLoading = false;
-        draft.mainPosts = draft.mainPosts.concat(data); //data.concat(draft.mainPosts);
+        draft.mainPosts = data.concat(draft.mainPosts); //data.concat(draft.mainPosts);
         draft.hasMorePost = draft.mainPosts.length < 50; // 게시글을 50개만 보겠다.
     }),
     [LOAD_POST_FAILURE]: (state, { data }) => 
       produce(state, draft => {
         draft.loadPostLoading = false;
         draft.loadPostError = data.error;
+    }),
+    [LIKE_POST_REQUEST]: (state) =>
+      produce(state, draft => {
+        draft.likePostDone = false;
+        draft.likePostLoading = true;
+        draft.likePostError = null;
+    }),
+    [LIKE_POST_SUCCESS]: (state, { data }) => 
+      produce(state, draft => {
+        const post = draft.mainPosts.find((v) => v.id === data.PostId);
+        post.Likers.push({ id: data.UserId });
+        draft.likePostDone = true;
+        draft.likePostLoading = false;
+    }),
+    [LIKE_POST_FAILURE]: (state, { data }) => 
+      produce(state, draft => {
+        draft.likePostLoading = false;
+        draft.likePostError = data.error;
+    }),
+    [UNLIKE_POST_REQUEST]: (state) =>
+      produce(state, draft => {
+        draft.unLikePostDone = false;
+        draft.unLikePostLoading = true;
+        draft.unLikePostError = null;
+    }),
+    [UNLIKE_POST_SUCCESS]: (state, { data }) => 
+      produce(state, draft => {
+        console.log('unlike data');
+        console.log(data);
+        const post = draft.mainPosts.find((v) => v.id === data.PostId);
+        post.Likers = post.Likers.filter((v) => v.id !== data.UserId);
+        draft.unLikePostDone = true;
+        draft.unLikePostLoading = false;
+    }),
+    [UNLIKE_POST_FAILURE]: (state, { data }) => 
+      produce(state, draft => {
+        draft.unLikePostLoading = false;
+        draft.unLikePostError = data.error;
     }),
     [REMOVE_POST_REQUEST]: (state) => 
       produce(state, draft => {
@@ -143,9 +194,11 @@ const reducer = handleActions(
     }),
     [REMOVE_POST_SUCCESS]: (state, { data }) => 
       produce(state, draft => {
-        draft.mainPosts = draft.mainPosts.filter(v => v.id !== data );
+        console.log('REMOVE_POST_SUCCESS');
+        console.log(data);
         draft.removePostLoading = false;
         draft.removePostDone = true;
+        draft.mainPosts = draft.mainPosts.filter(v => v.id !== data.PostId );
     }),
     [REMOVE_POST_FAILURE]: (state, { data }) => 
       produce(state, draft => {
@@ -160,8 +213,15 @@ const reducer = handleActions(
     }),
     [ADD_COMMENT_SUCCESS]: (state, { data }) => 
       produce(state, draft => {
+        console.log('redux addcommentSuccess data');
+        console.log(data);
+        console.log('draft.mainPosts');
+        console.log(draft.mainPosts);
+        console.log('data.PostId: ', data.id);
         const post = draft.mainPosts.find((v) => v.id === data.PostId);
-        post.Comments.unshift(data.content);
+        console.log('post');
+        console.log(post);
+        post.Comments.unshift(data);
         draft.addCommentLoading = false,
         draft.addCommentDone = true
     }),

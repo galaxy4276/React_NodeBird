@@ -5,7 +5,6 @@ const { User } = require('../models');
 export default () => {
   passport.serializeUser((user, done) => { // req.login 의 정보가 들어감
     console.log('serializeUser');
-    console.log(user.id);
     done(null, user.id);
   });
 

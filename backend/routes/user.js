@@ -123,5 +123,20 @@ router.post('/', async (req, res, next) => { // POST /user/
   }
 });
 
+router.patch('/nickname', isLoggedIn, async (req, res, next) => {
+  console.log('patch nickname');
+  try {
+    await User.update({
+      nickname: req.body.nickname,
+    }, {
+      where: { id: req.user.id }
+    });
+    res.status(200).json({ nickname: req.body.nickname });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+})
+
 
 export default router;

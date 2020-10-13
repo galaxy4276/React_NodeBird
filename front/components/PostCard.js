@@ -8,7 +8,9 @@ import PostImages from './PostImages';
 import CommentForm from './CommentForm';
 import styled from 'styled-components';
 import PostCardContent from './PostCardContent';
-import { REMOVE_POST_REQUEST } from '../reducers/post';
+import { REMOVE_POST_REQUEST,
+  LIKE_POST_REQUEST, UNLIKE_POST_REQUEST
+} from '../reducers/post';
 import FollowButton from './FollowButton';
 
 
@@ -18,7 +20,6 @@ const CardWrapper = styled.div`
 
 
 const PostCard = ({ post }) => {
-  const [liked, setLiked] = useState(false);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
 
   const dispatch = useDispatch();
@@ -26,8 +27,18 @@ const PostCard = ({ post }) => {
   const id = useSelector((state) => state.user.me?.id);
   const { removePostLoading } = useSelector((state) => state.post);
   // const id = me?.id;  // me && me.id;
-  const onToggleLike = useCallback(() => {
-    setLiked(prev => !prev); // 이전 데이터가 들어가 있음. 
+  const onLike = useCallback(() => {
+    dispatch({
+      type: LIKE_POST_REQUEST,
+      data: post.id
+    });
+  }, []);
+
+  const onUnlike = useCallback(() => {
+    dispatch({
+      type: UNLIKE_POST_REQUEST,
+      data: post.id,
+    });
   }, []);
 
   const onToggleComment = useCallback(() => {
@@ -41,6 +52,8 @@ const PostCard = ({ post }) => {
     })
   }, []);
 
+  const liked = post.Likers.find((v) => v.id === id);
+
   return (
     <CardWrapper key={post.id} >
       <Card
@@ -48,8 +61,8 @@ const PostCard = ({ post }) => {
         actions={[
           <RetweetOutlined key="retweet" />,
           liked
-            ? <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onToggleLike} />
-            : <HeartOutlined key="heart" onClick={onToggleLike} />,
+            ? <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onUnlike} />
+            : <HeartOutlined key="heart" onClick={onLike} />,
           <MessageOutlined key="comment" onClick={onToggleComment} />,
           <Popover 
             key="more" 
@@ -90,7 +103,10 @@ const PostCard = ({ post }) => {
             header={`${post.Comments.length}개의 댓글`}
             itemLayout="horizontal"
             dataSource={post.Comments}
-            renderItem={(item) => (
+            renderItem={(item) => {
+              console.log('item');
+              console.log(item);
+              return (
               <li>
                 <Comment
                   author={item.User.nickname}
@@ -98,7 +114,7 @@ const PostCard = ({ post }) => {
                   content={item.content}
                 />
               </li>
-            )}
+              )}}
           />
         </>
       )}
@@ -108,12 +124,13 @@ const PostCard = ({ post }) => {
 
 PostCard.propTypes = { 
   post: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.number,
     User: PropTypes.object,
     content: PropTypes.string,
-    createdAt: PropTypes.object,
+    createdAt: PropTypes.string,
     Comments: PropTypes.arrayOf(PropTypes.object), // 객체들의 배열
     Images: PropTypes.arrayOf(PropTypes.object), // 객체들의 배열
+    Likers: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
 };
 // shape는 object 요소를 모두 정의

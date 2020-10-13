@@ -182,8 +182,9 @@ const reducer = handleActions(
         draft.changeNicknameDone = false;
         draft.changeNicknameError = null;
     }),
-    [CHANGE_NICKNAME_SUCCESS]: (state) => 
+    [CHANGE_NICKNAME_SUCCESS]: (state, { data }) => 
       produce(state, draft => {
+        draft.me.nickname = data.nickname;
         draft.changeNicknameLoading = false;
         draft.changeNicknameDone = true;
     }),
