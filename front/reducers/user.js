@@ -25,6 +25,15 @@ export const initialState = {
   loadUserLoading: false, // 유저 정보 가져오기 시도 중
   loadUserDone: false,
   loadUserError: null,
+  loadFollowersLoading: false, // 팔로워 정보 불러오기
+  loadFollowersDone: false,
+  loadFollowersError: null,
+  loadFollowingsLoading: false, // 팔로잉 정보 불러오기
+  loadFollowingsDone: false,
+  loadFollowingsError: null,
+  removeFollowerLoading: false, // 팔로워 차단
+  removeFollowerDone: false,
+  removeFollowerError: null,
   me: null,
   signUpData: {},
   loginData: {},
@@ -39,6 +48,18 @@ export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
 export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
 export const LOAD_MY_INFO_FAILURE = 'LOAD_MY_INFO_FAILURE';
 
+export const LOAD_FOLLOWERS_REQUEST = 'LOAD_FOLLOWERS_REQUEST';
+export const LOAD_FOLLOWERS_SUCCESS = 'LOAD_FOLLOWERS_SUCCESS';
+export const LOAD_FOLLOWERS_FAILURE = 'LOAD_FOLLOWERS_FAILURE';
+
+export const LOAD_FOLLOWINGS_REQUEST = 'LOAD_FOLLOWINGS_REQUEST';
+export const LOAD_FOLLOWINGS_SUCCESS = 'LOAD_FOLLOWINGS_SUCCESS';
+export const LOAD_FOLLOWINGS_FAILURE = 'LOAD_FOLLOWINGS_FAILURE';
+
+export const REMOVE_FOLLOWER_REQUEST = 'REMOVE_FOLLOWER_REQUEST';
+export const REMOVE_FOLLOWER_SUCCESS = 'REMOVE_FOLLOWER_SUCCESS';
+export const REMOVE_FOLLOWER_FAILURE = 'REMOVE_FOLLOWER_FAILURE';
+
 export const LOG_OUT_REQUEST = 'LOG_OUT_REQUEST';
 export const LOG_OUT_SUCCESS = 'LOG_OUT_SUCCESS';
 export const LOG_OUT_FAILURE = 'LOG_OUT_FAILURE';
@@ -47,9 +68,9 @@ export const SIGN_UP_REQUEST = 'SIGN_UP_REQEUST';
 export const SIGN_UP_SUCCESS = 'SIGN_UP_SUCCESS';
 export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
 
-export const CHANGE_NICKNAME_REQUEST = 'SIGN_UP_REQEUST';
-export const CHANGE_NICKNAME_SUCCESS = 'SIGN_UP_SUCCESS';
-export const CHANGE_NICKNAME_FAILURE = 'SIGN_UP_FAILURE';
+export const CHANGE_NICKNAME_REQUEST = 'CHANGE_NICKNAME_REQEUST';
+export const CHANGE_NICKNAME_SUCCESS = 'CHANGE_NICKNAME_SUCCESS';
+export const CHANGE_NICKNAME_FAILURE = 'CHANGE_NICKNAME_FAILURE';
 
 export const FOLLOW_REQUEST = 'FOLLOW_REQUEST';
 export const FOLLOW_SUCCESS = 'FOLLOW_SUCCESS';
@@ -85,7 +106,7 @@ const reducer = handleActions(
       produce(state, draft => {
         draft.unFollowLoading = false;
         draft.unFollowDone = true;
-        draft.me.Followings = draft.me.Followings.filter((v) => v.id !== data);
+        draft.me.Followings = draft.me.Followings.filter((v) => v.id !== data.UserId);
     }),
     [UNFOLLOW_FAILURE]: (state, payload) =>
       produce(state, draft => {
@@ -102,7 +123,7 @@ const reducer = handleActions(
       produce(state, draft => {
         draft.followLoading = false;
         draft.followDone = true;
-        draft.me.Followings.push({ id: data });
+        draft.me.Followings.push({ id: data.UserId });
     }),
     [FOLLOW_FAILURE]: (state, payload) =>
       produce(state, draft => {
@@ -160,6 +181,57 @@ const reducer = handleActions(
       loadUserLoading: false,
       loadUserError: error || 'critical',
     }),
+    [LOAD_FOLLOWERS_REQUEST]: (state) => 
+      produce(state, draft => {
+        draft.loadFollowersLoading = true;
+        draft.loadFollowersDone = false;
+        draft.loadFollowersError = null;
+    }),
+    [LOAD_FOLLOWERS_SUCCESS]: (state, { data }) => 
+      produce(state, draft => {
+        draft.loadFollowersLoading = false;
+        draft.loadFollowersDone = true;
+        draft.me.Followers = data;
+    }),
+    [LOAD_FOLLOWERS_FAILURE]: (state, { error }) => ({
+      ...state,
+      loadFollowersLoading: false,
+      loadFollowersError: error || 'critical',
+    }),
+    [LOAD_FOLLOWERS_REQUEST]: (state) => 
+      produce(state, draft => {
+        draft.loadFollowersLoading = true;
+        draft.loadFollowersDone = false;
+        draft.loadFollowersError = null;
+    }),
+    [LOAD_FOLLOWERS_SUCCESS]: (state, { data }) => 
+      produce(state, draft => {
+        draft.loadFollowersLoading = false;
+        draft.loadFollowersDone = true;
+        draft.me.Followers = data;
+    }),
+    [LOAD_FOLLOWERS_FAILURE]: (state, { error }) => ({
+      ...state,
+      loadFollowersLoading: false,
+      loadFollowersError: error || 'critical',
+    }),
+    [REMOVE_FOLLOWER_REQUEST]: (state) => 
+      produce(state, draft => {
+        draft.removeFollowerLoading = true;
+        draft.removeFollowerDone = false;
+        draft.removeFollowerError = null;
+    }),
+    [REMOVE_FOLLOWER_SUCCESS]: (state, { data }) => 
+      produce(state, draft => {
+        draft.removeFollowerLoading = false;
+        draft.removeFollowerDone = true;
+        draft.me.Followers = draft.me.Followers.filter((v) => v.id !== data.UserId);
+    }),
+    [REMOVE_FOLLOWER_FAILURE]: (state, { error }) => ({
+      ...state,
+      removeFollowerLoading: false,
+      removeFollowerError: error || 'critical',
+    }),
     [SIGN_UP_REQUEST]: (state) => 
       produce(state, draft => {
         draft.signUpLoading = true;
@@ -173,6 +245,8 @@ const reducer = handleActions(
     }),
     [SIGN_UP_FAILURE]: (state, { error }) => 
       produce(state, draft => {
+        console.log('SIGN_UP_FAILURE Redux');
+        console.error(error);
         draft.signUpLoading = false;
         draft.signUpError = error;
     }),

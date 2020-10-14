@@ -96,12 +96,14 @@ router.post('/logout', (req, res, next) => {
 
 router.post('/', async (req, res, next) => { // POST /user/
   const { email, nickname, password } = req.body; 
+  console.log(`email:${email}\nnickname:${nickname}\npassword:${password}`);
   try {
     const exUser = await User.findOne({
       where: {
         email
       }
     });
+    console.log(exUser);
 
     if (exUser) {
       return res.status(403).send('이미 사용중인 아이디입니다.'); 
@@ -126,17 +128,94 @@ router.post('/', async (req, res, next) => { // POST /user/
 router.patch('/nickname', isLoggedIn, async (req, res, next) => {
   console.log('patch nickname');
   try {
-    await User.update({
-      nickname: req.body.nickname,
-    }, {
-      where: { id: req.user.id }
-    });
-    res.status(200).json({ nickname: req.body.nickname });
+    if (req.body.nickname) {
+      await User.update({
+        nickname: req.body.nickname,
+      }, {
+        where: { id: req.user.id }
+      });
+      return res.status(200).json({ nickname: req.body.nickname });
+    } 
+    res.status(401).json('req.body.nickname이 확인되지 않았습니다.');
   } catch (err) {
     console.error(err);
     next(err);
   }
 })
+
+router.patch('/:userId/follow', isLoggedIn, async (req, res, next) => { // PATCH /user/1/follow
+  try {
+    const user = await User.findOne({ where: { id: req.params.userId }});
+    if (!user) {
+      return res.status(403).send('유령을 팔로우하려고 하시네요?');
+    }
+    await user.addFollowers(req.user.id);
+    res.status(200).json({ UserId: parseInt(req.params.userId) });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+});
+
+router.delete('/:userId/follow', isLoggedIn, async (req, res, next) => {
+  try {
+    const user = await User.findOne({ where: { id: req.params.userId }});
+    if (!user) {
+      return res.status(403).send('유령을 언팔로우하려고 하시네요?');
+    }
+    await user.removeFollowers(req.user.id);
+    res.status(200).json({ UserId: parseInt(req.params.userId) });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+});
+
+router.delete('/follower/:userId', isLoggedIn, async (req, res, next) => { // DELETE /user.follower/2
+  try {
+    const user = await User.findOne({ where: { id: req.user.id }});
+    if (!user) {
+      return res.status(403).send('유령을 차단하려고 하시네요?');
+    }
+    await user.removeFollowers(req.params.userId);
+    res.status(200).json({ UserId: parseInt(req.params.userId, 10) });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+});
+
+router.get('/followers', isLoggedIn, async (req, res, next) => { // GET /user/followers
+  try {
+    const user = await User.findOne({ where: { id: req.user.id }});
+    if (!user) {
+      return res.status(403).send('유령을 팔로우하려고 하시네요?');
+    }
+    const followers = await user.getFollowers();
+    res.status(200).json(followers);
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+});
+
+
+router.get('/followings', isLoggedIn, async (req, res, next) => { // GET /user/followings
+  try {
+    const user = await User.findOne({ where: { id: req.user.id }});
+    if (!user) {
+      return res.status(403).send('유령을 팔로우하려고 하시네요?');
+    }
+    const followings = await user.getFollowings();
+    res.status(200).json(followings);
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+});
+
+
+
 
 
 export default router;

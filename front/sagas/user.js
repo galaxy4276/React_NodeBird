@@ -7,6 +7,9 @@ import {
   UNFOLLOW_REQUEST, UNFOLLOW_SUCCESS, UNFOLLOW_FAILURE,
   LOAD_MY_INFO_REQUEST, LOAD_MY_INFO_SUCCESS, LOAD_MY_INFO_FAILURE,
   CHANGE_NICKNAME_REQUEST, CHANGE_NICKNAME_SUCCESS, CHANGE_NICKNAME_FAILURE,
+  LOAD_FOLLOWERS_REQUEST, LOAD_FOLLOWERS_SUCCESS, LOAD_FOLLOWERS_FAILURE,
+  LOAD_FOLLOWINGS_REQUEST, LOAD_FOLLOWINGS_SUCCESS, LOAD_FOLLOWINGS_FAILURE,
+  REMOVE_FOLLOWER_REQUEST, REMOVE_FOLLOWER_SUCCESS, REMOVE_FOLLOWER_FAILURE,
 } from '../reducers/user';
 import axios from 'axios';
 
@@ -55,13 +58,14 @@ function signUpAPI(data) {
 
 function* signUp(action) {
   try {
+    console.log('signUpSaga');
     const result = yield call(signUpAPI, action.data);
     console.log(result);
     yield put({
       type: SIGN_UP_SUCCESS,
     });
   } catch (err) {
-    console.log('SIGN_UP_SAGA');
+    console.log('SIGN_UP_SAGA_ERROR');
     console.error(err);
     yield put({
       type: SIGN_UP_FAILURE,
@@ -70,18 +74,20 @@ function* signUp(action) {
   }
 }
 
-function followAPI() {
-  return axios.post('/api/follow');
+function followAPI(data) {
+  return axios.patch(`/user/${data}/follow`);
 }
 
 function* follow(action) {
   try {
-    yield delay(1000);
+    const result = yield call(followAPI, action.data);
     yield put({
       type: FOLLOW_SUCCESS,
-      data: action.data
+      data: result.data
     });
   } catch (err) {
+    console.log('follow Saga Error');
+    console.error(err);
     yield put({
       type: FOLLOW_FAILURE,
       error: err.response.data
@@ -89,16 +95,16 @@ function* follow(action) {
   }
 }
 
-function unFollowAPI() {
-  return axios.post('/api/unfollow');
+function unFollowAPI(data) {
+  return axios.delete(`/user/${data}/follow`);
 }
 
 function* unFollow(action) {
   try {
-    yield delay(1000);
+    const result = yield call(unFollowAPI, action.data);
     yield put({
       type: UNFOLLOW_SUCCESS,
-      data: action.data
+      data: result.data
     });
   } catch (err) {
     yield put({
@@ -147,6 +153,68 @@ function* changeNickname(action) {
   }
 }
 
+function loadFollowersAPI(data) {
+  return axios.get('/user/followers', data);
+}
+
+function* loadFollowers(action) {
+  try {
+    const result = yield call(loadFollowersAPI, action.data);
+    yield put({
+      type: LOAD_FOLLOWERS_SUCCESS,
+      data: result.data
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_FOLLOWERS_FAILURE,
+      error: err.response.data
+    });
+  }
+}
+
+function loadFollowingsAPI(data) {
+  return axios.get('/user/followings', data);
+}
+
+function* loadFollowings(action) {
+  try {
+    const result = yield call(loadFollowingsAPI, action.data);
+    yield put({
+      type: LOAD_FOLLOWINGS_SUCCESS,
+      data: result.data
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_FOLLOWINGS_FAILURE,
+      error: err.response.data
+    });
+  }
+}
+
+function removeFollowerAPI(data) {
+  return axios.delete(`/user/follower/${data}`);
+}
+
+function* removeFollower(action) {
+  try {
+    const result = yield call(removeFollowerAPI, action.data);
+    yield put({
+      type: REMOVE_FOLLOWER_SUCCESS,
+      data: result.data
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: REMOVE_FOLLOWER_FAILURE,
+      error: err.response.data
+    });
+  }
+}
+
+
+
 
 function* watchFollow() {
   yield takeLatest(FOLLOW_REQUEST, follow);
@@ -176,9 +244,25 @@ function* watchChangeNickname() {
   yield takeLatest(CHANGE_NICKNAME_REQUEST, changeNickname);
 }
 
+function* watchLoadFollowers() {
+  yield takeLatest(LOAD_FOLLOWERS_REQUEST, loadFollowers);
+}
+
+function* watchLoadFollowings() {
+  yield takeLatest(LOAD_FOLLOWINGS_REQUEST, loadFollowings);
+}
+
+function* watchRemoveFollower() {
+  yield takeLatest(REMOVE_FOLLOWER_REQUEST, removeFollower);
+}
+
+
 
 export default function* userSaga() {
   yield all([
+    fork(watchRemoveFollower),
+    fork(watchLoadFollowers),
+    fork(watchLoadFollowings),
     fork(watchChangeNickname),
     fork(watchLoadUser),
     fork(watchFollow),
