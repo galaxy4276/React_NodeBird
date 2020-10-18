@@ -11,6 +11,9 @@ export const initialState = {
   addPostLoading: false, // post sucessful is true
   addPostDone: false,
   addPostError: null,
+  uploadImageLoading: false, 
+  uploadImageDone: false,
+  uploadImageError: null,
   loadPostLoading: false, 
   loadPostDone: false,
   loadPostError: null,
@@ -69,19 +72,15 @@ export const genereateDummyPost = number => Array(number).fill().map(() => ({
 //   };
 // };
 
-const dummyComment = (data) => ({
-  id: shortid.generate(),
-  content: data,
-  User: {
-    id: 1,
-    nickname: '최은기',
-  },
-});
-
-
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
+
+export const UPLOAD_IMAGES_REQUEST = 'UPLOAD_IMAGES_REQUEST';
+export const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS';
+export const UPLOAD_IMAGES_FAILURE = 'UPLOAD_IMAGES_FAILURE';
+
+export const REMOVE_IMAGE = 'REMOVE_IMAGE';
 
 export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST';
 export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS';
@@ -112,6 +111,10 @@ export const addCommentRequest = createAction(ADD_COMMENT_REQUEST, data => data)
 
 const reducer = handleActions(
   {
+    [REMOVE_IMAGE]: (state, { data }) =>  // 프론트 측에서만 제거
+      produce(state, draft => {
+        draft.imagePaths = draft.imagePaths.filter((v, i) => i !== data);
+    }),
     [ADD_POST_REQUEST]: (state) =>
       produce(state, draft => {
         draft.addPostLoading = true;
@@ -132,6 +135,7 @@ const reducer = handleActions(
     }),
     [LOAD_POST_REQUEST]: (state) =>
       produce(state, draft => {
+        console.log('[REDUX:]LOAD_POST_REQUEST');
         draft.loadPostDone = false;
         draft.loadPostLoading = true;
         draft.loadPostError = null;
@@ -147,6 +151,23 @@ const reducer = handleActions(
       produce(state, draft => {
         draft.loadPostLoading = false;
         draft.loadPostError = data.error;
+    }),
+    [UPLOAD_IMAGES_REQUEST]: (state) =>
+      produce(state, draft => {
+        draft.uploadImageDone = false;
+        draft.uploadImageLoading = true;
+        draft.uploadImageError = null;
+    }),
+    [UPLOAD_IMAGES_SUCCESS]: (state, { data }) => 
+      produce(state, draft => {
+        draft.imagePaths = data;
+        draft.uploadImageDone = true;
+        draft.uploadImageLoading = false;
+    }),
+    [UPLOAD_IMAGES_FAILURE]: (state, { data }) => 
+      produce(state, draft => {
+        draft.uploadImageLoading = false;
+        draft.uploadImageError = data.error;
     }),
     [LIKE_POST_REQUEST]: (state) =>
       produce(state, draft => {

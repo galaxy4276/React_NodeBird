@@ -3,6 +3,7 @@ const { Post, User, Image, Comment } = require('../models');
 
 
 router.get('/', async (req, res, next) => {
+  console.log('posts load');
   try {
     const posts = await Post.findAll({
       // where: { id: lastId },

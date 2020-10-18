@@ -30,7 +30,6 @@ router.get('/', async (req, res, next) => {
         }]
       });
       
-      console.log(user);
     
       res.status(200).json(user);
     } else {

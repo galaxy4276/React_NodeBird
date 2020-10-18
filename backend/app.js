@@ -9,6 +9,7 @@ import passportConfig from './passport';
 import cookie from 'cookie-parser';
 import session from 'express-session';
 import passport from 'passport';
+import path from 'path';
 require('dotenv').config();
 
 
@@ -25,6 +26,7 @@ app.use(cors({
   credentials: true,
 })); // *origin -> 허용 도메인 
 app.use(logger('dev'));
+app.use('/', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookie(process.env.SECRET));
