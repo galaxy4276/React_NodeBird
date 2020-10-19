@@ -48,10 +48,10 @@ const PostForm = () => {
     }
     const formData = new FormData(); //for practice on multer.
     imagePaths.forEach((p) => { // 이미지와 콘텐트를 합침
-      formData.append('image', i);
+      formData.append('image', p); // req.body.image
     });
-    formData.append('content', text);
-    dispatch({
+    formData.append('content', text); // req.body.content
+    return dispatch({
       type: ADD_POST_REQUEST,
       data: formData,
     });

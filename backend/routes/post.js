@@ -2,6 +2,7 @@ import { isLoggedIn, isNotLoggedIn } from './middlewares';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { hash } from 'bcrypt';
 
 
 const router = require('express').Router();
@@ -16,14 +17,42 @@ const { Post, Comment, Image, User } = require('../models');
 //   fs.mkdirSync('uploads');
 // }
 
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, 'uploads');
+    },
+    filename(req, file, done) { // 은기초.png
+      const ext = path.extname(file.originalname); // 확장자 추출(.png)
+      const basename = path.basename(file.originalname); // 은기초
+      done(null, basename + '_' + new Date().getTime() + ext); // 은기초123139123.png
+    },
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 } // 20MB
+});
 
-router.post('/', async (req, res, next) => {
+router.post('/', upload.none(), async (req, res, next) => {
   const { content } = req.body;
   try {
+    const hashtags = req.body.content.match(/#[^\s#]+/g);
     const post = await Post.create({
       content,
       UserId: req.user.id,
     });
+
+    if (hashtags) {
+      await Promise.all(hashtags.map((tag) => hashtags.create({ name: tag.slice(1).toLowerCase() })));
+    }
+
+    if (req.body.image) {
+      if (Array.isArray(req.body.image)) { // 이미지를 여러 개 올리면 image: [1.png, 2.png]
+        const images = await Promise.all(req.body.image.map((image) => Image.create({ src: image })));
+        await post.addImages(images);
+      } else { // 이미지를 하나만 올리면 image: 1.png ( none array )
+        const image = await Image.create({ src: req.body.image });
+        await post.addImages(image);
+      }
+    }
 
     const fullPost = await Post.findOne({
       where: { id: post.id },
@@ -51,19 +80,7 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-const upload = multer({
-  storage: multer.diskStorage({
-    destination(req, file, done) {
-      done(null, 'uploads');
-    },
-    filename(req, file, done) { // 은기초.png
-      const ext = path.extname(file.originalname); // 확장자 추출(.png)
-      const basename = path.basename(file.originalname); // 은기초
-      done(null, basename + '_' + new Date().getTime() + ext); // 은기초123139123.png
-    },
-  }),
-  limits: { fileSize: 20 * 1024 * 1024 } // 20MB
-});
+
 router.post('/images', isLoggedIn, upload.array('image'), (req, res, next) => { // POST /post/images
   console.log(req.files); // 업로드된 이미지의 정보가 들어있다.
   res.json(req.files.map((v) => v.filename));

@@ -127,6 +127,7 @@ const reducer = handleActions(
         draft.addPostLoading = false;
         draft.addPostDone = true;
         draft.mainPosts.unshift(data);
+        draft.imagePaths = [];
     }),
     [ADD_POST_FAILURE]: (state, { data }) => 
       produce(state, draft => {
