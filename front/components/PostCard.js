@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card, Button, Popover, List, Comment, Avatar } from 'antd';
 import { EllipsisOutlined, HeartOutlined, 
   MessageOutlined, RetweetOutlined, HeartTwoTone } from '@ant-design/icons';
@@ -9,7 +9,7 @@ import CommentForm from './CommentForm';
 import styled from 'styled-components';
 import PostCardContent from './PostCardContent';
 import { REMOVE_POST_REQUEST,
-  LIKE_POST_REQUEST, UNLIKE_POST_REQUEST
+  LIKE_POST_REQUEST, UNLIKE_POST_REQUEST, RETWEET_REQUEST
 } from '../reducers/post';
 import FollowButton from './FollowButton';
 
@@ -25,17 +25,31 @@ const PostCard = ({ post }) => {
   const dispatch = useDispatch();
 
   const id = useSelector((state) => state.user.me?.id);
-  const { removePostLoading } = useSelector((state) => state.post);
+  const { removePostLoading, retweetError } = useSelector((state) => state.post);
   // const id = me?.id;  // me && me.id;
+
+  // useEffect(() => {
+  //   if (retweetError) {
+  //     alert(retweetError);
+  //   }
+  // }, [retweetError]);
+
+
   const onLike = useCallback(() => {
-    dispatch({
+    if (!id) {
+      return alert('로그인이 필요합니다!');
+    }
+    return dispatch({
       type: LIKE_POST_REQUEST,
       data: post.id
     });
   }, []);
 
   const onUnlike = useCallback(() => {
-    dispatch({
+    if (!id) {
+      return alert('로그인이 필요합니다!');
+    }
+    return dispatch({
       type: UNLIKE_POST_REQUEST,
       data: post.id,
     });
@@ -46,7 +60,10 @@ const PostCard = ({ post }) => {
   }, []);
 
   const onRemovePost = useCallback(() => {
-    dispatch({
+    if (!id) {
+      return alert('로그인이 필요합니다!');
+    }
+    return dispatch({
       type: REMOVE_POST_REQUEST,
       data: post.id,
     })
@@ -56,7 +73,10 @@ const PostCard = ({ post }) => {
     if (!id) {
       return alert('로그인이 필요합니다.');
     }
-    
+    return dispatch({
+      type: RETWEET_REQUEST,
+      data: post.id,
+    });
   }, [id]);
 
   const liked = post.Likers.find((v) => v.id === id);
@@ -95,13 +115,28 @@ const PostCard = ({ post }) => {
             <EllipsisOutlined />
           </Popover>
         ]}
+        title={post.RetweetId ? `${post.User.nickname}님이 리트윗 하셨습니다.` : null}
         extra={id && <FollowButton post={post} />}
       >
-        <Card.Meta
-          avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
-          title={post.User.nickname}
-          description={<PostCardContent postData={post.content} />}
-        />
+        {post.RetweetId && post.Retweet
+          ? (
+            <Card
+              cover={post.Retweet.Images[0] && <PostImages images={post.Retweet.Images} />}
+            >
+              <Card.Meta
+                avatar={<Avatar>{post.Retweet.User.nickname[0]}</Avatar>}
+                title={post.Retweet.User.nickname}
+                description={<PostCardContent postData={post.Retweet.content} />}
+              />
+            </Card>
+          )
+          : (
+          <Card.Meta
+            avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
+            title={post.User.nickname}
+            description={<PostCardContent postData={post.content} />}
+          />)
+        }
       </Card>
       {commentFormOpened && (
         <>
@@ -138,6 +173,8 @@ PostCard.propTypes = {
     Comments: PropTypes.arrayOf(PropTypes.object), // 객체들의 배열
     Images: PropTypes.arrayOf(PropTypes.object), // 객체들의 배열
     Likers: PropTypes.arrayOf(PropTypes.object),
+    RetweetId: PropTypes.number,
+    Retweet: PropTypes.objectOf(PropTypes.any),
   }).isRequired,
 };
 // shape는 object 요소를 모두 정의

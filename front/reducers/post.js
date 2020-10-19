@@ -29,6 +29,9 @@ export const initialState = {
   unLikePostLoading: false, 
   unLikePostDone: false,
   unLikePostError: null,
+  retweetLoading: false, 
+  retweetDone: false,
+  retweetError: null,
 };
 
 
@@ -75,6 +78,10 @@ export const genereateDummyPost = number => Array(number).fill().map(() => ({
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
+
+export const RETWEET_REQUEST = 'RETWEET_REQUEST';
+export const RETWEET_SUCCESS = 'RETWEET_SUCCESS';
+export const RETWEET_FAILURE = 'RETWEET_FAILURE';
 
 export const UPLOAD_IMAGES_REQUEST = 'UPLOAD_IMAGES_REQUEST';
 export const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS';
@@ -169,6 +176,23 @@ const reducer = handleActions(
       produce(state, draft => {
         draft.uploadImageLoading = false;
         draft.uploadImageError = data.error;
+    }),
+    [RETWEET_REQUEST]: (state) =>
+      produce(state, draft => {
+        draft.retweetDone = false;
+        draft.retweetLoading = true;
+        draft.retweetError = null;
+    }),
+    [RETWEET_SUCCESS]: (state, { data }) => 
+      produce(state, draft => {
+        draft.mainPosts.unshift(data);
+        draft.retweetDone = true;
+        draft.retweetLoading = false;
+    }),
+    [RETWEET_FAILURE]: (state, { data }) => 
+      produce(state, draft => {
+        draft.retweetLoading = false;
+        draft.retweetError = data;
     }),
     [LIKE_POST_REQUEST]: (state) =>
       produce(state, draft => {
