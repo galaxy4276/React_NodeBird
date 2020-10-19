@@ -6,7 +6,7 @@ import { hash } from 'bcrypt';
 
 
 const router = require('express').Router();
-const { Post, Comment, Image, User } = require('../models');
+const { Post, Comment, Image, User, Hashtag } = require('../models');
 
 
 
@@ -41,7 +41,10 @@ router.post('/', upload.none(), async (req, res, next) => {
     });
 
     if (hashtags) {
-      await Promise.all(hashtags.map((tag) => hashtags.create({ name: tag.slice(1).toLowerCase() })));
+      const result = await Promise.all(hashtags.map((tag) => Hashtag.findOrCreate({
+        where: { name: tag.slice(1).toLowerCase() }
+      }))); // [[노드, true], [리액트, true]] 즉 배열에서 첫 번째 값만
+      await post.addHashtags(result.map((v) => v[0]));
     }
 
     if (req.body.image) {

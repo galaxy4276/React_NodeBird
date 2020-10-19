@@ -63,8 +63,8 @@ export const Global = createGlobalStyle`
   .slick-slide {
     display: inline-block;
     img {
-      width: 350px;
-      max-width: 400px;
+      max-width: fit-content;
+      height: fit-content;
     }
   }
   .ant-card-cover {
