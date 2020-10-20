@@ -152,8 +152,8 @@ const reducer = handleActions(
       produce(state, draft => {
         draft.loadPostDone = true;
         draft.loadPostLoading = false;
-        draft.mainPosts = data.concat(draft.mainPosts); //data.concat(draft.mainPosts);
-        draft.hasMorePost = draft.mainPosts.length < 50; // 게시글을 50개만 보겠다.
+        draft.mainPosts = draft.mainPosts.concat(data); //data.concat(draft.mainPosts);
+        draft.hasMorePost = draft.mainPosts.length === 10;
     }),
     [LOAD_POST_FAILURE]: (state, { data }) => 
       produce(state, draft => {

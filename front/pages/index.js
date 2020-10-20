@@ -19,6 +19,8 @@ const Home = () => {
     }
   }, [retweetError]);
 
+
+
   useEffect(() => {
     dispatch({
       type: LOAD_MY_INFO_REQUEST,
@@ -32,10 +34,12 @@ const Home = () => {
     function onScroll() {
       // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
       if ((window.scrollY + document.documentElement.clientHeight
-        > document.documentElement.scrollHeight - 600) && !loadPostLoading) {
-          if (hasMorePost) {
+        > document.documentElement.scrollHeight - 300) && !loadPostLoading) {
+          if (hasMorePost && !loadPostLoading) {
+            const lastId = mainPosts[mainPosts.length - 1]?.id;
             dispatch({
               type: LOAD_POST_REQUEST,
+              lastId,
             });
           }
         }
@@ -45,7 +49,7 @@ const Home = () => {
     return () => {
       window.removeEventListener('scroll', onScroll);
     }
-  }, [hasMorePost, loadPostLoading]);
+  }, [hasMorePost, loadPostLoading, mainPosts]);
 
   return (
     <AppLayout>

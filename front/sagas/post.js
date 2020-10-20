@@ -37,14 +37,14 @@ function* addPost(action) {
   }
 }
 
-function loadPostAPI() {
-  return axios.get('/posts');
+function loadPostAPI(lastId) {
+  return axios.get(`/posts?lastId=${lastId || 0}`);
 }
 
-function* loadPost() {
+function* loadPost({ lastId }) {
   console.log('[SAGA:]LOAD_POST'); 
   try {
-    const result = yield call(loadPostAPI);
+    const result = yield call(loadPostAPI, lastId);
     yield put({
       type: LOAD_POST_SUCCESS,
       data: result.data,

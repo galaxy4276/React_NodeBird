@@ -1,11 +1,19 @@
 const router = require('express').Router();
 const { Post, User, Image, Comment } = require('../models');
+import { Op } from 'sequelize';
 
 
 router.get('/', async (req, res, next) => {
-  console.log('posts load');
   try {
+
+    const where = {};
+
+    if (parseInt(req.query.lastId, 10)) {
+      where.id = { [Op.lt]: parseInt(req.query.lastId, 10)};
+    } // lastId보다 작은거 10개불러오기
+
     const posts = await Post.findAll({
+      where,
       // where: { id: lastId },
       limit: 10,
       //offset: 0, // 1 ~ 10 까지 10개 가져와~ 10일경우 11 ~ 20
