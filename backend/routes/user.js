@@ -42,6 +42,48 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+
+
+router.get('/:userId', async (req, res, next) => { // GET /user/1
+  console.log(req.headers); // 여기 안에 쿠키가 들어있다.
+  try {
+    const fullUserWithoutPassword = await User.findOne({
+      where: { id: req.params.userId },
+      attributes: {
+        exclude: ['password'],
+      },
+      include: [{
+        model: Post,
+        attributes: ['id'],
+      }, {
+        model: User,
+        as: 'Followings',
+        attributes: ['id'],
+      }, {
+        model: User,
+        as: 'Followers',
+        attributes: ['id'],
+      }]
+    });
+
+    if (fullUserWithoutPassword) {
+      const data = fullUserWithoutPassword.toJSON();
+      // sequelize에서 보내주는 데이터는 json 이 아니다.
+      data.Posts = data.Posts.length; // 개인정보 침해 예방
+      data.Followers = data.Followers.length;
+      data.Followings = data.Followings.length;
+      res.status(200).json(fullUserWithoutPassword);
+    } else {
+      res.status(404).send('존재하지 않는 사용자입니다.');
+    }
+  } catch(err) {
+    console.log('LOAD_USER ERROR');
+    console.error(err);
+    next(err);
+  }
+});
+
+
 router.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) {
