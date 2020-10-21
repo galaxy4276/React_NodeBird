@@ -25,6 +25,9 @@ export const initialState = {
   loadUserLoading: false, // 유저 정보 가져오기 시도 중
   loadUserDone: false,
   loadUserError: null,
+  loadMyInfoLoading: false, // 유저 정보 가져오기 시도 중
+  loadMyInfoDone: false,
+  loadMyInfoError: null,
   loadFollowersLoading: false, // 팔로워 정보 불러오기
   loadFollowersDone: false,
   loadFollowersError: null,
@@ -35,8 +38,7 @@ export const initialState = {
   removeFollowerDone: false,
   removeFollowerError: null,
   me: null,
-  signUpData: {},
-  loginData: {},
+  userInfo: null,
 };
 
 
@@ -47,6 +49,10 @@ export const LOG_IN_FAILURE = 'LOG_IN_FAILURE';
 export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
 export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
 export const LOAD_MY_INFO_FAILURE = 'LOAD_MY_INFO_FAILURE';
+
+export const LOAD_USER_REQUEST = 'LOAD_USER_REQUEST';
+export const LOAD_USER_SUCCESS = 'LOAD_USER_SUCCESS';
+export const LOAD_USER_FAILURE = 'LOAD_USER_FAILURE';
 
 export const LOAD_FOLLOWERS_REQUEST = 'LOAD_FOLLOWERS_REQUEST';
 export const LOAD_FOLLOWERS_SUCCESS = 'LOAD_FOLLOWERS_SUCCESS';
@@ -166,17 +172,34 @@ const reducer = handleActions(
     }),
     [LOAD_MY_INFO_REQUEST]: (state) => 
       produce(state, draft => {
+        draft.loadMyInfoLoading = true;
+        draft.loadMyInfoDone = false;
+        draft.loadMyInfoError = null;
+    }),
+    [LOAD_MY_INFO_SUCCESS]: (state, { data }) => 
+      produce(state, draft => {
+        draft.loadMyInfoLoading = false;
+        draft.loadMyInfoDone = true;
+        draft.me = data;
+    }),
+    [LOAD_MY_INFO_FAILURE]: (state, { error }) => ({
+      ...state,
+      loadMyInfoLoading: false,
+      loadMyInfoError: error || 'critical',
+    }),
+    [LOAD_USER_REQUEST]: (state) => 
+      produce(state, draft => {
         draft.loadUserLoading = true;
         draft.loadUserDone = false;
         draft.loadUserError = null;
     }),
-    [LOAD_MY_INFO_SUCCESS]: (state, { data }) => 
+    [LOAD_USER_SUCCESS]: (state, { data }) => 
       produce(state, draft => {
         draft.loadUserLoading = false;
         draft.loadUserDone = true;
-        draft.me = data;
+        draft.userInfo = data;
     }),
-    [LOAD_MY_INFO_FAILURE]: (state, { error }) => ({
+    [LOAD_USER_FAILURE]: (state, { error }) => ({
       ...state,
       loadUserLoading: false,
       loadUserError: error || 'critical',

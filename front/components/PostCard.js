@@ -28,11 +28,7 @@ const PostCard = ({ post }) => {
   const { removePostLoading, retweetError } = useSelector((state) => state.post);
   // const id = me?.id;  // me && me.id;
 
-  // useEffect(() => {
-  //   if (retweetError) {
-  //     alert(retweetError);
-  //   }
-  // }, [retweetError]);
+
 
 
   const onLike = useCallback(() => {

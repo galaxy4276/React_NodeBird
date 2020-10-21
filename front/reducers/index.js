@@ -3,22 +3,24 @@ import { combineReducers } from 'redux';
 
 import user from './user';
 import post from './post';
+import { handleActions } from 'redux-actions';
 
 
 // (prevState, action) => nextAction 
-const rootReducer = combineReducers({
-  index: (state = {}, action) => { // Reducer for HYDRATE
-    switch (action.type) {
-      case HYDRATE: // SSR
-        console.log('HYDRATE', action);
-        return { ...state, ...action.payload };
-      default:
-        return state;
+const rootReducer = (state, action) => {
+  switch (action.type) {
+    case HYDRATE:
+      console.log('HYDRATE', action);
+      return action.payload;
+    default: {
+      const combinedReducer = combineReducers({
+        user,
+        post,
+      });
+      return combinedReducer(state, action);
     }
-  },
-  user,
-  post, 
-});
+  }
+}
 
 
 export default rootReducer;

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import Head from 'next/head';
 
 import wrapper from "../store/configureStore";
-import withReduxSaga from 'next-redux-saga'; // next, redux HoC 연동
 
 
 const NodeBird = ({ Component }) => {
@@ -25,4 +24,4 @@ NodeBird.propTypes = {
 }
 
 
-export default wrapper.withRedux(withReduxSaga(NodeBird));
+export default wrapper.withRedux(NodeBird);

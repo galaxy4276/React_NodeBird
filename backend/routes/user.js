@@ -7,7 +7,7 @@ const { User, Post } = require('../models');
 
 
 router.get('/', async (req, res, next) => {
-  console.log('load user');
+  console.log(req.headers); // 여기 안에 쿠키가 들어있다.
   try {
     if (req.user) {
       console.log('getUser req.user.id: ', req.user.id);
