@@ -4,6 +4,7 @@ import db from './models';
 import postRouter from './routes/post';
 import postsRouter from './routes/posts';
 import userRouter from './routes/user';
+import hashRouter from './routes/hashtag';
 import cors from 'cors';
 import passportConfig from './passport';
 import cookie from 'cookie-parser';
@@ -39,6 +40,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+app.use('/hashtag', hashRouter);
 app.use('/post', postRouter);
 app.use('/posts', postsRouter);
 app.use('/user', userRouter);

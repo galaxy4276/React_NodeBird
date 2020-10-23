@@ -10,6 +10,8 @@ import {
   UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_SUCCESS, UPLOAD_IMAGES_FAILURE,
   RETWEET_REQUEST, RETWEET_SUCCESS, RETWEET_FAILURE,
   LOAD_ONE_POST_REQUEST, LOAD_ONE_POST_SUCCESS, LOAD_ONE_POST_FAILURE,
+  LOAD_USER_POSTS_REQUEST, LOAD_USER_POSTS_SUCCESS, LOAD_USER_POSTS_FAILURE,
+  LOAD_HASHTAG_POSTS_REQUEST, LOAD_HASHTAG_POSTS_SUCCESS, LOAD_HASHTAG_POSTS_FAILURE,
 } from '../reducers/post';
 import axios from 'axios';
 
@@ -206,6 +208,46 @@ function* loadOnePost(action) {
   }
 }
 
+function loadUserPostAPI(data, lastId) {
+  return axios.get(`/user/${data}/posts?lastId=${lastId || 0}`);
+}
+
+function* loadUserPost(action) {
+  try {
+    const result = yield call(loadUserPostAPI, action.data, action.lastId);
+    yield put({
+      type: LOAD_USER_POSTS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_USER_POSTS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+function loadHastagPostAPI(data, lastId) {
+  return axios.get(`/hashtag/${encodeURIComponent(data)}?lastId=${lastId || 0}`);
+}
+
+function* loadHastagPost(action) {
+  try {
+    console.log('loadHashtag console');
+    const result = yield call(loadHastagPostAPI, action.data, action.lastId);
+    yield put({
+      type: LOAD_HASHTAG_POSTS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_HASHTAG_POSTS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
 
 function* watchAddPost() {
   yield takeLatest(ADD_POST_REQUEST, addPost);
@@ -243,6 +285,15 @@ function* watchOneLoadPost() {
   yield takeLatest(LOAD_ONE_POST_REQUEST, loadOnePost);
 }
 
+function* watchLoadUserPost() {
+  yield takeLatest(LOAD_USER_POSTS_REQUEST, loadUserPost);
+}
+
+function* watchLoadHastagPost() {
+  yield takeLatest(LOAD_HASHTAG_POSTS_REQUEST, loadHastagPost);
+}
+
+
 
 export default function* postSaga() {
   yield all([
@@ -251,6 +302,8 @@ export default function* postSaga() {
     fork(watchUnLikePost),
     fork(watchAddPost),
     fork(watchLoadPost),
+    fork(watchLoadUserPost),
+    fork(watchLoadHastagPost),
     fork(watchOneLoadPost),
     fork(watchRemovePost),
     fork(watchAddComment),
