@@ -5,7 +5,7 @@ import Head from 'next/head';
 
 import wrapper from "../store/configureStore";
 
-
+// 모든 페이지의 공통 페이지
 const NodeBird = ({ Component }) => {
   return (
     <>
