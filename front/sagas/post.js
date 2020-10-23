@@ -9,6 +9,7 @@ import {
   UNLIKE_POST_REQUEST, UNLIKE_POST_SUCCESS, UNLIKE_POST_FAILURE, 
   UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_SUCCESS, UPLOAD_IMAGES_FAILURE,
   RETWEET_REQUEST, RETWEET_SUCCESS, RETWEET_FAILURE,
+  LOAD_ONE_POST_REQUEST, LOAD_ONE_POST_SUCCESS, LOAD_ONE_POST_FAILURE,
 } from '../reducers/post';
 import axios from 'axios';
 
@@ -184,6 +185,27 @@ function* retWeet(action) {
   }
 }
 
+function loadOnePostAPI(data) {
+  return axios.get(`/post/${data}`);
+}
+
+function* loadOnePost(action) {
+  console.log(action);
+  try {
+    const result = yield call(loadOnePostAPI, action.data);
+    yield put({
+      type: LOAD_ONE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_ONE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
 
 function* watchAddPost() {
   yield takeLatest(ADD_POST_REQUEST, addPost);
@@ -217,6 +239,10 @@ function* watchRetweet() {
   yield takeLatest(RETWEET_REQUEST, retWeet);
 }
 
+function* watchOneLoadPost() {
+  yield takeLatest(LOAD_ONE_POST_REQUEST, loadOnePost);
+}
+
 
 export default function* postSaga() {
   yield all([
@@ -225,6 +251,7 @@ export default function* postSaga() {
     fork(watchUnLikePost),
     fork(watchAddPost),
     fork(watchLoadPost),
+    fork(watchOneLoadPost),
     fork(watchRemovePost),
     fork(watchAddComment),
     fork(watchRetweet),

@@ -7,6 +7,7 @@ import faker from 'faker';
 export const initialState = {
   mainPosts: [],
   imagePaths: [], // Save image path
+  singlePost: null, // 하나만 불러오니까 null
   hasMorePost: true,
   addPostLoading: false, // post sucessful is true
   addPostDone: false,
@@ -17,6 +18,9 @@ export const initialState = {
   loadPostLoading: false, 
   loadPostDone: false,
   loadPostError: null,
+  loadOnePostLoading: false, 
+  loadOnePostDone: false,
+  loadOnePostError: null,
   removePostLoading: false, // post sucessful is true
   removePostDone: false,
   removePostError: null,
@@ -93,6 +97,10 @@ export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST';
 export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS';
 export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE';
 
+export const LOAD_ONE_POST_REQUEST = 'LOAD_ONE_POST_REQUEST';
+export const LOAD_ONE_POST_SUCCESS = 'LOAD_ONE_POST_SUCCESS';
+export const LOAD_ONE_POST_FAILURE = 'LOAD_ONE_POST_FAILURE';
+
 export const REMOVE_POST_REQUEST = 'REMOVE_POST_REQUEST';
 export const REMOVE_POST_SUCCESS = 'REMOVE_POST_SUCCESS';
 export const REMOVE_POST_FAILURE = 'REMOVE_POST_FAILURE';
@@ -159,6 +167,24 @@ const reducer = handleActions(
       produce(state, draft => {
         draft.loadPostLoading = false;
         draft.loadPostError = data.error;
+    }),
+    [LOAD_ONE_POST_REQUEST]: (state) =>
+      produce(state, draft => {
+        console.log('[REDUX:]LOAD_ONE_POST_REQUEST');
+        draft.loadOnePostDone = false;
+        draft.loadOnePostLoading = true;
+        draft.loadOnePostError = null;
+    }),
+    [LOAD_ONE_POST_SUCCESS]: (state, { data }) => 
+      produce(state, draft => {
+        draft.loadOnePostDone = true;
+        draft.loadOnePostLoading = false;
+        draft.singlePost = data; //data.concat(draft.mainPosts);
+    }),
+    [LOAD_ONE_POST_FAILURE]: (state, { data }) => 
+      produce(state, draft => {
+        draft.loadOnePostLoading = false;
+        draft.loadOnePostError = data;
     }),
     [UPLOAD_IMAGES_REQUEST]: (state) =>
       produce(state, draft => {
