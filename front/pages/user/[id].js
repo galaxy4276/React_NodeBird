@@ -85,7 +85,18 @@ const User = () => {
   );
 };
 
-export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
+export async function getStaticPaths() {
+  return {
+    paths: [
+      { params: { id: '61' }},
+      { params: { id: '63' }},
+      { params: { id: '64' }},
+    ],
+    fallback: true,
+  }
+} 
+
+export const getStaticProps = wrapper.getStaticProps(async (context) => {
   const cookie = context.req ? context.req.headers.cookie : '';
   axios.defaults.headers.Cookie = '';
   if (context.req && cookie) {

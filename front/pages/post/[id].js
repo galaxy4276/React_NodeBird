@@ -15,6 +15,10 @@ const Post = () => {
   const {id} = router.query;
   const { singlePost } = useSelector((state) => state.post);
 
+  if (router.isFallback) {
+    return <div>로딩 중...</div>;
+  }
+
   return (
     <AppLayout>
       <Head>
@@ -32,7 +36,18 @@ const Post = () => {
   )
 };
 
-export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
+export async function getStaticPaths() {
+  return {
+    paths: [
+      { params: { id: '61' }},
+      { params: { id: '63' }},
+      { params: { id: '64' }},
+    ],
+    fallback: true,
+  }
+} 
+
+export const getStaticProps = wrapper.getStaticProps(async (context) => {
   const cookie = context.req ? context.req.headers.cookie : '';
   console.log(context);
   axios.defaults.headers.Cookie = '';
