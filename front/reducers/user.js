@@ -292,9 +292,9 @@ const reducer = handleActions(
         draft.changeNicknameLoading = false;
         draft.changeNicknameError = error || 'critical';
     }),
-    [ADD_POST_TO_ME]: (state, payload) => 
+    [ADD_POST_TO_ME]: (state, { data: id }) => 
       produce(state, draft => {
-        draft.me.Posts.unshift(payload.data);
+        draft.me.Posts.unshift({ id });
       }),
     [REMOVE_POST_OF_ME]: (state, { data }) => 
       produce(state, draft => {

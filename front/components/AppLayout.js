@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import PropTypes from "prop-types";
 import Link from "next/link";
 import { Menu, Input, Row, Col } from "antd"; // Grid System: Row, Col
@@ -6,7 +6,8 @@ import { Menu, Input, Row, Col } from "antd"; // Grid System: Row, Col
 import UserProfile from '../components/UserProfile';
 import LoginForm from '../components/LoginForm';
 import { useSelector } from 'react-redux';
-
+import useInput from "../hooks/useInput";
+import Router from 'next/router';
 
 // const SearchInput = styled(Input.Search)`
 //   vertical-align: middle;
@@ -14,7 +15,12 @@ import { useSelector } from 'react-redux';
 
 
 const AppLayout = ({ children }) => {
+  const [searchInput, onChangeSearchInput] = useInput('');
   const { me } = useSelector((state) => state.user);
+
+  const onSearch = useCallback(() => {
+    Router.push(`/hashtag/${searchInput}`); // 검색 페이지로 이동
+  }, [searchInput]);
 
   const style = useMemo(() => ({ verticalAlign: 'middle' }), []);
   
@@ -32,7 +38,12 @@ const AppLayout = ({ children }) => {
           </Link>
         </Menu.Item>
         <Menu.Item>
-          <Input.Search enterButton style={style} />
+          <Input.Search 
+            enterButton 
+            style={style} 
+            onChange={onChangeSearchInput}
+            onSearch={onSearch}
+          />
         </Menu.Item>
       </Menu>
       <Row gutter={8}>
