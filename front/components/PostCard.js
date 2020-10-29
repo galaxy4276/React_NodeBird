@@ -13,7 +13,10 @@ import { REMOVE_POST_REQUEST,
 } from '../reducers/post';
 import FollowButton from './FollowButton';
 import Link from 'next/link';
+import moment from 'moment';
 
+
+moment.locale('ko'); 
 
 const CardWrapper = styled.div`
   margin-bottom: 20px;
@@ -120,6 +123,7 @@ const PostCard = ({ post }) => {
             <Card
               cover={post.Retweet.Images[0] && <PostImages images={post.Retweet.Images} />}
             >
+              <div style={{ float: 'right' }}>{moment(post.createdAt).format('YYYY.MM.DD')}</div>
               <Card.Meta
                 avatar={<Link href={`/user/${post.User.id}`}><a><Avatar>{post.Retweet.User.nickname[0]}</Avatar></a></Link>}
                 title={post.Retweet.User.nickname}
@@ -128,18 +132,21 @@ const PostCard = ({ post }) => {
             </Card>
           )
           : (
-          <Card.Meta
-            avatar={<Link
-               href={`/user/${post.User.id}`}>
-                 <a>
-                   <Avatar>
-                     {post.User.nickname[0]}
-                  </Avatar>
-                </a>
-                </Link>}
-            title={post.User.nickname}
-            description={<PostCardContent postData={post.content} />}
-          />)
+          <>
+            <div style={{ float: 'right' }}>{moment(post.createdAt).format('YYYY.MM.DD')}</div>
+            <Card.Meta
+              avatar={<Link
+                href={`/user/${post.User.id}`}>
+                  <a>
+                    <Avatar>
+                      {post.User.nickname[0]}
+                    </Avatar>
+                  </a>
+                  </Link>}
+              title={post.User.nickname}
+              description={<PostCardContent postData={post.content} />}
+            />
+          </>)
         }
       </Card>
       {commentFormOpened && (
