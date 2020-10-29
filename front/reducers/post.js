@@ -1,6 +1,6 @@
 import { createAction, handleActions } from 'redux-actions';
 import shortid from 'shortid';
-import produce from 'immer';
+import produce from '../util/produce';
 import faker from 'faker';
 
 

@@ -1,6 +1,6 @@
 import { createAction, handleActions } from 'redux-actions';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from './post';
-import produce from 'immer';
+import produce from '../util/produce';
 
 
 export const initialState = {
