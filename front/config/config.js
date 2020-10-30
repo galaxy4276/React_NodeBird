@@ -1,1 +1,1 @@
-export const backUrl = 'http://13.209.8.112';
+export const backUrl = 'http://api.galaxyhi4276.co/';
