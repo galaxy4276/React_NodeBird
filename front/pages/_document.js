@@ -5,7 +5,7 @@ import { ServerStyleSheet } from 'styled-components';
 // 제일 상위에있는 태그들을 수정할 수 있다.
 
 export default class MyDocument extends Document {
-  static async getInitialProps(ctx) {
+  static async alProps(ctx) {
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
     
@@ -13,7 +13,7 @@ export default class MyDocument extends Document {
       ctx.renderPage = () => originalRenderPage({
         enhanceApp: (App) => (props) => sheet.collectStyles(<App { ...props } />),
       })
-      const initialProps = await Document.getInitialProps(ctx);
+      const initialProps = await Document.alProps(ctx);
       return {
         ...initialProps,
         styles: (
