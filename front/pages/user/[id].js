@@ -85,18 +85,18 @@ const User = () => {
   );
 };
 
-export async function getStaticPaths() {
-  return {
-    paths: [
-      { params: { id: '61' }},
-      { params: { id: '63' }},
-      { params: { id: '64' }},
-    ],
-    fallback: true,
-  }
-} 
+// export async function getStaticPaths() {
+//   return {
+//     paths: [
+//       { params: { id: '61' }},
+//       { params: { id: '63' }},
+//       { params: { id: '64' }},
+//     ],
+//     fallback: true,
+//   }
+// } 
 
-export const getStaticProps = wrapper.getStaticProps(async (context) => {
+export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
   const cookie = context.req ? context.req.headers.cookie : '';
   axios.defaults.headers.Cookie = '';
   if (context.req && cookie) {
