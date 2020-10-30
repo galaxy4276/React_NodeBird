@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon --exec babel-node app.js",
-    "start": "cross-env NODE_ENV=production pm2 start app --interpreter node_modules/@babel/node/bin/babel-node.js"
+    "start": "cross-env NODE_ENV=production pm2 start app.js --interpreter node_modules/@babel/node/bin/babel-node.js"
   },
   "keywords": [],
   "author": "",
