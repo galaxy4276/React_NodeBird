@@ -11,6 +11,8 @@ import cookie from 'cookie-parser';
 import session from 'express-session';
 import passport from 'passport';
 import path from 'path';
+import hpp from 'hpp';
+import helmet from 'helmet';
 require('dotenv').config();
 
 
@@ -22,11 +24,18 @@ db.sequelize.sync()
   .catch(console.error);
 passportConfig();
 
+if (process.env.NODE_ENV === 'production') {
+  app.use(logger('combined'));
+  app.use(hpp());
+  app.use(helmet());
+} else {
+  app.use(logger('dev'));
+}
+
 app.use(cors({
-  origin: 'http://localhost:3060',
+  origin: ['http://localhost:3060', 'galaxynodebird.com'],
   credentials: true,
 })); // *origin -> 허용 도메인 
-app.use(logger('dev'));
 app.use('/', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
