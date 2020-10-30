@@ -1,1 +1,1 @@
-export const backUrl = 'http://api.galaxyhi4276.co/';
+export const backUrl = 'http://api.galaxyhi4276.co';
