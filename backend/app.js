@@ -44,6 +44,11 @@ app.use(session({
   secret: process.env.SECRET,
   resave: false,
   saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: false,
+    domain: process.env.NODE_ENV === 'production' && '.galaxyhi4276.co',
+  }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
