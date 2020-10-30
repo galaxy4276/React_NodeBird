@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.use(cors({
-  origin: ['http://localhost:3060', 'galaxynodebird.com'],
+  origin: ['http://localhost:3060', 'galaxynodebird.com', 'http://54.180.105.152'],
   credentials: true,
 })); // *origin -> 허용 도메인 
 app.use('/', express.static(path.join(__dirname, 'uploads')));
