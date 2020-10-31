@@ -243,7 +243,7 @@ const reducer = handleActions(
     }),
     [UPLOAD_IMAGES_SUCCESS]: (state, { data }) => 
       produce(state, draft => {
-        draft.imagePaths = data;
+        draft.imagePaths = draft.imagePaths.concat(data);
         draft.uploadImageDone = true;
         draft.uploadImageLoading = false;
     }),
