@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.use(cors({
-  origin: ['http://localhost:3060', 'http://galaxyhi4276.co', 'http://15.165.220.207'],
+  origin: ['http://localhost:3060', 'http://galaxyhi4276.co', 'http://www.galaxyhi4276.co', 'http://15.165.220.207'],
   credentials: true,
 })); // *origin -> 허용 도메인 
 app.use('/', express.static(path.join(__dirname, 'uploads')));
