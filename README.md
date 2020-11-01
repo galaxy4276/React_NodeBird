@@ -7,7 +7,7 @@
 |개발환경|Node.js 12.x on Window|
 |프런트엔드|React|
 |UX/UI|Ant Design|
-|백엔드 | Express|
+|백엔드 | Express, Next |
 |배포|AWS EC2 & S3 & lambda |
 
 ### 주소 -> http://galaxyhi4276.co/
