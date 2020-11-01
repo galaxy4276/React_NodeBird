@@ -12,6 +12,11 @@
 
 ### 주소 -> http://galaxyhi4276.co/
 
+## 서비스 화면
+![login](./image/1.gif)
+&nbsp;&nbsp;&nbsp;
+![posting](./image/2.gif)
+
 ### 후기
 * 리액트와 express를 사용하면서 트위터 SNS를 클론코딩하고 서버 두개 ( 프론트, 백) 기반으로
 SSR과 SPA 를 지원하는 서비스에 대해서 이해하였습니다.
