@@ -10,7 +10,7 @@
 |백엔드 | Express, Next |
 |배포|AWS EC2 & S3 & lambda |
 
-### 주소 -> http://galaxyhi4276.co/
+### 주소 -> http://galaxyhi4276.co/ ( 비용문제 때문에 닫았습니다. )
 
 ## 서비스 화면
 ![login](./image/1.gif)
